@@ -1,52 +1,95 @@
+import { motion } from 'framer-motion';
 import { Icons } from './Icons';
+import { fadeUp, staggerContainer } from '../lib/motion';
 
 type Plan = {
   name: string;
+  pkg: string;
   price: string;
+  description: string;
   features: string[];
   cta: string;
   highlight?: boolean;
 };
 
-export const Pricing = () => {
+type Props = { onSelect: (pkg: string) => void };
+
+export const Pricing = ({ onSelect }: Props) => {
   const plans: Plan[] = [
     {
-      name: 'Starter',
-      price: '79',
-      features: ['Site 1 page', 'Hébergement inclus', 'SEO de base'],
-      cta: 'Choisir Starter',
+      name: 'Modernisation Essentielle',
+      pkg: 'Essentielle',
+      price: '399,99',
+      description: 'Landing page moderne',
+      features: ['Modernisation visuelle', 'Version mobile optimisée', 'Structure professionnelle', 'CTA clair', 'Livraison rapide'],
+      cta: "Demander une évaluation",
     },
     {
-      name: 'Pro',
-      price: '149',
-      features: ['Site 5 pages', 'Logo professionnel', 'Hébergement + maintenance', 'SEO local'],
-      cta: 'Choisir Pro',
+      name: 'Modernisation Plus',
+      pkg: 'Plus',
+      price: '499,99',
+      description: 'Landing page + logo',
+      features: ['Landing page moderne', 'Modernisation du logo', 'Image plus professionnelle', 'Design cohérent', 'Idéal pour PME locales'],
+      cta: "Demander une évaluation",
       highlight: true,
     },
     {
-      name: 'Complet',
-      price: '249',
-      features: ['Site 5 pages et +', 'Logo + branding', 'Réseaux sociaux', 'Contenu mensuel'],
-      cta: 'Choisir Complet',
+      name: 'Modernisation Pro',
+      pkg: 'Pro',
+      price: '799,99',
+      description: 'Landing page + 3 pages + logo',
+      features: ['Site plus complet', 'Présentation des services', 'Page contact', 'SEO local de base', 'Branding cohérent'],
+      cta: "Demander une évaluation",
+    },
+    {
+      name: 'Modernisation Complète',
+      pkg: 'Complète',
+      price: '999,99',
+      description: 'Image complète PME',
+      features: ['Landing page', '3 pages', 'Logo', 'Contenu médias sociaux', '2 publications par mois pendant 12 mois'],
+      cta: "Demander une évaluation",
     },
   ];
 
   return (
     <section className="bg-ink-800">
       <div className="max-w-[1200px] mx-auto px-8 py-20">
-        <div className="text-center text-brand font-semibold tracking-[0.18em] text-[12px] mb-3">
-          FORFAITS MENSUELS
-        </div>
-        <h2 className="text-center font-display font-extrabold text-white text-[40px] leading-[1.1] tracking-tight mb-12">
-          Simple, transparent, sans surprise.
-        </h2>
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-80px' }}
+        >
+          <div className="text-center text-brand font-semibold tracking-[0.18em] text-[12px] mb-3">
+            NOS FORFAITS
+          </div>
+          <h2 className="text-center font-display font-extrabold text-white text-[40px] leading-[1.1] tracking-tight mb-3">
+            Des forfaits simples. Sans surprise.
+          </h2>
+          <p className="text-center text-white/65 text-[16px] mb-12">
+            Choisissez le niveau de modernisation adapté à votre entreprise.
+          </p>
+        </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-80px' }}
+        >
           {plans.map((p) => {
             const isHighlight = !!p.highlight;
             return (
-              <div
+              <motion.div
                 key={p.name}
+                variants={fadeUp}
+                whileHover={{
+                  scale: 1.02,
+                  y: -4,
+                  boxShadow: '0 12px 36px -6px rgba(234,88,12,0.22)',
+                }}
+                transition={{ duration: 0.2 }}
                 className={[
                   'relative rounded-2xl p-8 flex flex-col',
                   isHighlight
@@ -61,10 +104,10 @@ export const Pricing = () => {
                 )}
 
                 <div className="text-white/85 font-semibold text-[16px]">{p.name}</div>
+                <div className="text-white/50 text-[13px] mt-1">{p.description}</div>
                 <div className="mt-3 flex items-baseline gap-1">
-                  <span className="font-display font-extrabold text-white text-[56px] leading-none tracking-tight">{p.price}</span>
-                  <span className="text-brand font-display font-extrabold text-[28px] leading-none">$</span>
-                  <span className="text-white/55 text-[14px] ml-1">/mois</span>
+                  <span className="font-display font-extrabold text-white text-[42px] leading-none tracking-tight">{p.price}</span>
+                  <span className="text-brand font-display font-extrabold text-[24px] leading-none">$</span>
                 </div>
 
                 <ul className="mt-6 space-y-2.5 text-white/80 text-[14px] flex-1">
@@ -77,6 +120,7 @@ export const Pricing = () => {
                 </ul>
 
                 <button
+                  onClick={() => onSelect(p.pkg)}
                   className={[
                     'mt-7 w-full py-3 rounded-md font-semibold text-[14px] transition-colors cursor-pointer',
                     isHighlight
@@ -86,10 +130,10 @@ export const Pricing = () => {
                 >
                   {p.cta}
                 </button>
-              </div>
+              </motion.div>
             );
           })}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

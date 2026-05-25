@@ -1,0 +1,109 @@
+Connecte le formulaire EvaluationForm au vrai schéma Supabase Signa existant.
+
+IMPORTANT :
+Ne crée PAS de nouvelle table evaluation_requests.
+Le système doit utiliser les tables déjà existantes :
+- profiles
+- companies
+- projects
+- questionnaires
+- files
+
+Architecture actuelle :
+- React
+- TypeScript
+- Vite
+- Supabase
+
+Objectif :
+Quand un client soumet le questionnaire depuis la landing page :
+
+1. vérifier si un profile existe déjà avec l’email
+2. sinon créer un profile client
+3. créer une company
+4. créer un project
+5. créer un questionnaire
+6. uploader les fichiers
+7. créer les entrées files
+
+QUESTIONNAIRE
+
+Sauvegarder toutes les réponses dans :
+questionnaires.answers
+
+Utiliser JSONB.
+
+Structure JSON recommandée :
+{
+  "business": {},
+  "current_presence": {},
+  "needs": [],
+  "problems": [],
+  "package": "",
+  "message": ""
+}
+
+PROJECTS
+
+Créer automatiquement :
+- status = 'nouveau'
+- priority = 'normale'
+- title = 'Demande d’évaluation gratuite'
+- purchased_at = now()
+
+PRODUCTS
+
+Associer automatiquement le bon product_id selon le forfait choisi :
+- Essentielle
+- Plus
+- Pro
+- Complète
+
+FILES
+
+Uploader les fichiers dans Supabase Storage :
+uploads/{projectId}/{timestamp}-{filename}
+
+Puis créer une entrée dans :
+files
+
+avec :
+- project_id
+- uploaded_by
+- storage_path
+- file_name
+- mime_type
+- size_bytes
+- is_deliverable = false
+
+IMPORTANT
+
+Ne jamais utiliser :
+SUPABASE_SERVICE_ROLE_KEY
+dans le frontend.
+
+Utiliser seulement :
+- NEXT_PUBLIC_SUPABASE_URL
+- NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+Créer :
+src/lib/supabase.ts
+
+Créer :
+submitEvaluation()
+
+Le formulaire doit :
+- afficher erreurs claires
+- afficher loading state
+- afficher succès final
+
+Message succès :
+“Votre demande a été envoyée avec succès. Signa analysera votre présence en ligne et vous contactera rapidement.”
+
+Conserver :
+- design actuel
+- animations
+- style premium Signa
+
+Vérifier :
+npm run build

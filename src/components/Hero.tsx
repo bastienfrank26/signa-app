@@ -1,55 +1,93 @@
+import { motion } from 'framer-motion';
 import { Icons } from './Icons';
 import { SiteMockup } from './SiteMockup';
+import { fadeUp, staggerContainer } from '../lib/motion';
 
-export const Hero = () => {
+type Props = { onOpenForm: () => void };
+
+export const Hero = ({ onOpenForm }: Props) => {
   return (
     <section className="relative overflow-hidden">
       <div className="max-w-[1200px] mx-auto px-8 pt-10 pb-16 grid grid-cols-12 gap-8 items-center">
         {/* Left copy */}
-        <div className="col-span-12 lg:col-span-6 relative z-10">
-          <div className="text-brand font-semibold tracking-[0.18em] text-[13px] mb-5">
+        <motion.div
+          className="col-span-12 lg:col-span-6 relative z-10"
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+        >
+          <motion.div variants={fadeUp} className="text-brand font-semibold tracking-[0.18em] text-[13px] mb-5">
             SITES WEB &nbsp;•&nbsp; LOGOS &nbsp;•&nbsp; BRANDING
-          </div>
-          <h1 className="font-display font-extrabold text-white text-[64px] leading-[1.02] tracking-tight">
-            Votre entreprise<br />
-            mérite mieux<br />
-            qu'un site <span className="text-brand">dépassé.</span>
-          </h1>
-          <p className="mt-6 text-white/70 text-[16px] leading-relaxed max-w-[440px]">
-            Sites web modernes, logos professionnels et branding conçus pour les PME québécoises, propulsés par l'IA.
-          </p>
+          </motion.div>
+          <motion.h1 variants={fadeUp} className="font-display font-extrabold text-white text-[64px] leading-[1.02] tracking-tight">
+            Votre entreprise mérite<br />
+            une image à la hauteur<br />
+            de votre <span className="text-brand">service.</span>
+          </motion.h1>
+          <motion.p variants={fadeUp} className="mt-6 text-white/70 text-[16px] leading-relaxed max-w-[440px]">
+            Modernisation de sites web, logos et présence en ligne pour PME québécoises.
+          </motion.p>
 
-          <div className="mt-8 flex flex-wrap gap-3">
-            <a href="#" className="inline-flex items-center gap-3 px-6 py-3.5 rounded-md bg-brand hover:bg-brand-600 transition-colors text-white font-semibold">
-              Voir des exemples
+          <motion.div variants={fadeUp} className="mt-8 flex flex-wrap gap-3">
+            <motion.button
+              onClick={onOpenForm}
+              whileHover={{ boxShadow: '0 0 24px rgba(234,88,12,0.5)' }}
+              transition={{ duration: 0.2 }}
+              className="inline-flex items-center gap-3 px-6 py-3.5 rounded-md bg-brand hover:bg-brand-600 transition-colors text-white font-semibold cursor-pointer"
+            >
+              Demander une évaluation gratuite
               <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-white/15">
                 <Icons.ArrowRight className="w-3.5 h-3.5" />
               </span>
-            </a>
+            </motion.button>
             <a href="#" className="inline-flex items-center px-6 py-3.5 rounded-md border border-white/25 hover:border-white/50 transition-colors text-white font-semibold">
-              Obtenir une soumission
+              Voir nos réalisations
             </a>
-          </div>
+          </motion.div>
 
-          <div className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-3 text-[13px] text-white/75">
-            <span className="inline-flex items-center gap-2">
+          <motion.div variants={fadeUp} className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-3 text-[13px] text-white/75">
+            <motion.span
+              className="inline-flex items-center gap-2"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5, duration: 0.4 }}
+            >
               <Icons.Bolt className="w-4 h-4 text-brand" />
-              Livré en <strong className="text-white font-semibold">quelques jours</strong>
-            </span>
-            <span className="inline-flex items-center gap-2">
+              <strong className="text-white font-semibold">Livraison rapide</strong>
+            </motion.span>
+            <motion.span
+              className="inline-flex items-center gap-2"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.65, duration: 0.4 }}
+            >
               <Icons.Dollar className="w-4 h-4 text-brand" />
-              À partir de <strong className="text-white font-semibold">79$/mois</strong>
-            </span>
-            <span className="inline-flex items-center gap-2">
+              <strong className="text-white font-semibold">Prix fixes simples</strong>
+            </motion.span>
+            <motion.span
+              className="inline-flex items-center gap-2"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.8, duration: 0.4 }}
+            >
               <Icons.Maple className="w-4 h-4 text-brand" />
               <strong className="text-white font-semibold">100% québécois</strong>
-            </span>
-          </div>
-        </div>
+            </motion.span>
+          </motion.div>
+        </motion.div>
 
         {/* Right: device cluster */}
-        <div className="col-span-12 lg:col-span-6 relative">
-          <div className="relative h-[460px]">
+        <motion.div
+          className="col-span-12 lg:col-span-6 relative"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.7, delay: 0.35 }}
+        >
+          <motion.div
+            className="relative h-[460px]"
+            animate={{ y: [0, -10, 0] }}
+            transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
+          >
             {/* Orange glow blob */}
             <div className="absolute -top-10 right-0 w-[420px] h-[420px] rounded-full bg-brand/30 blur-3xl"></div>
 
@@ -75,8 +113,8 @@ export const Hero = () => {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
     </section>
   );

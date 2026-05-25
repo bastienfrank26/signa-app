@@ -1,0 +1,148 @@
+Tu travailles sur le projet React + TypeScript + Vite “signa-app”.
+
+Objectif :
+Modifier uniquement le contenu marketing de la landing page Signa. Ne refais pas le design. Ne change pas les couleurs, les animations, les composants visuels ou la structure générale.
+
+Fichiers à modifier :
+- src/components/Header.tsx
+- src/components/Hero.tsx
+- src/components/WhySigna.tsx
+- src/components/Pricing.tsx
+- src/components/CtaBand.tsx
+Optionnel :
+- src/components/BeforeAfter.tsx si le texte peut être amélioré sans changer le design.
+
+Retirer partout :
+- 79$/mois
+- 149$/mois
+- 249$/mois
+- /mois
+- mensuel
+- forfaits mensuels
+- abonnement
+- hébergement inclus
+- maintenance incluse
+- contenu mensuel
+
+Nouveau positionnement :
+Signa modernise les sites web, logos et présences en ligne des PME québécoises avec des forfaits à prix fixe, simples, rapides et professionnels.
+
+CTA principal partout :
+“Demander une évaluation gratuite”
+
+Header :
+Garder le logo Signa.
+Remplacer les liens par :
+- Services
+- Réalisations
+- Forfaits
+- Évaluation gratuite
+
+Remplacer le bouton :
+“Obtenir une soumission”
+par :
+“Évaluation gratuite”
+
+Hero :
+Remplacer le titre actuel par :
+“Votre entreprise mérite une image à la hauteur de votre service.”
+
+Remplacer le sous-titre par :
+“Modernisation de sites web, logos et présence en ligne pour PME québécoises.”
+
+Remplacer les boutons par :
+- “Demander une évaluation gratuite”
+- “Voir nos réalisations”
+
+Remplacer les badges par :
+- Livraison rapide
+- Prix fixes simples
+- 100% québécois
+
+WhySigna :
+Utiliser ces 3 piliers :
+
+1. Rapide
+“Votre nouvelle image livrée rapidement, sans processus compliqué.”
+
+2. Accessible
+“Des forfaits clairs à prix fixe conçus pour les PME d’ici.”
+
+3. Professionnel
+“Une présence en ligne moderne qui inspire confiance dès les premières secondes.”
+
+Pricing :
+Remplacer complètement les anciens plans Starter / Pro / Complet par 4 plans :
+
+1. Modernisation Essentielle
+Prix : 399,99 $
+Description : Landing page moderne
+Features :
+- Modernisation visuelle
+- Version mobile optimisée
+- Structure professionnelle
+- CTA clair
+- Livraison rapide
+CTA : “Demander une évaluation”
+
+2. Modernisation Plus
+Prix : 499,99 $
+Description : Landing page + logo
+Badge : Le plus populaire
+Features :
+- Landing page moderne
+- Modernisation du logo
+- Image plus professionnelle
+- Design cohérent
+- Idéal pour PME locales
+CTA : “Demander une évaluation”
+
+3. Modernisation Pro
+Prix : 799,99 $
+Description : Landing page + 3 pages + logo
+Features :
+- Site plus complet
+- Présentation des services
+- Page contact
+- SEO local de base
+- Branding cohérent
+CTA : “Demander une évaluation”
+
+4. Modernisation Complète
+Prix : 999,99 $
+Description : Image complète PME
+Features :
+- Landing page
+- 3 pages
+- Logo
+- Contenu médias sociaux
+- 2 publications par mois pendant 12 mois
+CTA : “Demander une évaluation”
+
+Titre de section Pricing :
+“Des forfaits simples. Sans surprise.”
+
+Sous-titre :
+“Choisissez le niveau de modernisation adapté à votre entreprise.”
+
+Important :
+Le prix doit s’afficher avec le symbole $ mais jamais avec “/mois”.
+
+CtaBand :
+Remplacer le titre par :
+“Votre présence en ligne travaille-t-elle vraiment pour vous?”
+
+Remplacer le texte par :
+“Faites analyser gratuitement votre site web, votre logo ou votre image actuelle.”
+
+Remplacer le bouton par :
+“Demander une évaluation gratuite”
+
+Remplacer la ligne de confiance par :
+“Prix fixes | Processus simple | Service 100% québécois”
+
+Après les modifications :
+- lancer npm run build
+- corriger toute erreur TypeScript
+- ne pas supprimer les composants existants
+- ne pas changer le style global

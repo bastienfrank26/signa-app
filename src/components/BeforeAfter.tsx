@@ -1,11 +1,19 @@
+import { motion } from 'framer-motion';
 import { Icons } from './Icons';
 import { SiteMockup } from './SiteMockup';
+import { fadeUp } from '../lib/motion';
 
 export const BeforeAfter = () => {
   return (
     <section className="bg-cream-100 text-ink-800">
       <div className="max-w-[1200px] mx-auto px-8 py-20 grid grid-cols-12 gap-10 items-center">
-        <div className="col-span-12 lg:col-span-4">
+        <motion.div
+          className="col-span-12 lg:col-span-4"
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-80px' }}
+        >
           <div className="text-brand font-semibold tracking-[0.18em] text-[13px] mb-5">
             AVANT / APRÈS
           </div>
@@ -15,9 +23,16 @@ export const BeforeAfter = () => {
           <p className="mt-5 text-ink-800/65 text-[15px] leading-relaxed max-w-[360px]">
             On modernise votre image pour que vous inspiriez confiance dès le premier clic.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="col-span-12 lg:col-span-8">
+        <motion.div
+          className="col-span-12 lg:col-span-8"
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ delay: 0.15 }}
+        >
           <div className="flex items-center gap-4">
             <div className="flex-1 relative">
               <SiteMockup brand="Les Entreprises Paquette inc." variant="legacy" photoLabel="ancienne photo" cta="Contactez-nous" />
@@ -35,7 +50,7 @@ export const BeforeAfter = () => {
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
