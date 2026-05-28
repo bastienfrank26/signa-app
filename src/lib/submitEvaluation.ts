@@ -46,7 +46,10 @@ export async function submitEvaluation(data: EvaluationFormData): Promise<void> 
     },
   });
 
-  if (fnError) throw new Error(fnError.message);
+  if (fnError) {
+    const serverMsg = (result as { error?: string } | null)?.error;
+    throw new Error(serverMsg ?? fnError.message);
+  }
 
   const { projectId, profileId, error: resultError } = result as {
     projectId: string;
