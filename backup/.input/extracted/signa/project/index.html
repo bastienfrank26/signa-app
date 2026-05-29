@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Signa — Sites web, logos et branding pour PME québécoises</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          display: ['"Inter Tight"', 'system-ui', 'sans-serif'],
+          sans: ['Inter', 'system-ui', 'sans-serif'],
+        },
+        colors: {
+          ink: {
+            900: '#06101e',
+            800: '#0a1628',
+            700: '#0e1c33',
+            600: '#142540',
+          },
+          cream: {
+            50:  '#faf7f1',
+            100: '#f5f1ea',
+            200: '#ece6dc',
+          },
+          brand: {
+            DEFAULT: '#f97316',
+            500:     '#f97316',
+            600:     '#ea6a12',
+            700:     '#c2570d',
+            soft:    '#ffedd5',
+          },
+        },
+        boxShadow: {
+          card: '0 12px 32px -12px rgba(8, 16, 30, 0.25)',
+          screen: '0 30px 60px -20px rgba(0,0,0,0.55)',
+        },
+      },
+    },
+  };
+</script>
+
+<style>
+  html, body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  .font-display { font-family: 'Inter Tight', system-ui, sans-serif; letter-spacing: -0.02em; }
+  .hero-glow {
+    background:
+      radial-gradient(ellipse 60% 50% at 75% 35%, rgba(249,115,22,0.32) 0%, rgba(249,115,22,0) 60%),
+      linear-gradient(180deg, #0a1628 0%, #0a1628 100%);
+  }
+  /* Subtle diagonal stripe pattern used as image placeholders */
+  .placeholder-stripes {
+    background-image: repeating-linear-gradient(
+      135deg,
+      rgba(255,255,255,0.06) 0 8px,
+      rgba(255,255,255,0) 8px 16px
+    ), linear-gradient(180deg, #1f2a3d 0%, #15202f 100%);
+  }
+  .placeholder-stripes-light {
+    background-image: repeating-linear-gradient(
+      135deg,
+      rgba(10,22,40,0.06) 0 8px,
+      rgba(10,22,40,0) 8px 16px
+    ), linear-gradient(180deg, #ede7dc 0%, #e3dcd0 100%);
+  }
+</style>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body class="bg-ink-800 text-white">
+  <div id="root"></div>
+
+  <!-- Components -->
+  <script type="text/babel" data-presets="typescript,react" src="src/components/Icons.tsx"></script>
+  <script type="text/babel" data-presets="typescript,react" src="src/components/SiteMockup.tsx"></script>
+  <script type="text/babel" data-presets="typescript,react" src="src/components/Header.tsx"></script>
+  <script type="text/babel" data-presets="typescript,react" src="src/components/Hero.tsx"></script>
+  <script type="text/babel" data-presets="typescript,react" src="src/components/TrustBar.tsx"></script>
+  <script type="text/babel" data-presets="typescript,react" src="src/components/BeforeAfter.tsx"></script>
+  <script type="text/babel" data-presets="typescript,react" src="src/components/WhySigna.tsx"></script>
+  <script type="text/babel" data-presets="typescript,react" src="src/components/Realisations.tsx"></script>
+  <script type="text/babel" data-presets="typescript,react" src="src/components/Pricing.tsx"></script>
+  <script type="text/babel" data-presets="typescript,react" src="src/components/CtaBand.tsx"></script>
+  <script type="text/babel" data-presets="typescript,react" src="src/App.tsx"></script>
+</body>
+</html>

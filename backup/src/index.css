@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+@theme {
+  --font-family-display: "Inter Tight", system-ui, sans-serif;
+  --font-family-sans: Inter, system-ui, sans-serif;
+
+  --color-ink-900: #06101e;
+  --color-ink-800: #0a1628;
+  --color-ink-700: #0e1c33;
+  --color-ink-600: #142540;
+
+  --color-cream-50: #faf7f1;
+  --color-cream-100: #f5f1ea;
+  --color-cream-200: #ece6dc;
+
+  --color-brand: #f97316;
+  --color-brand-500: #f97316;
+  --color-brand-600: #ea6a12;
+  --color-brand-700: #c2570d;
+  --color-brand-soft: #ffedd5;
+
+  --shadow-card: 0 12px 32px -12px rgba(8, 16, 30, 0.25);
+  --shadow-screen: 0 30px 60px -20px rgba(0, 0, 0, 0.55);
+}
+
+html,
+body {
+  font-family: Inter, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  margin: 0;
+}
+
+#root {
+  width: 100%;
+}
+
+.font-display {
+  font-family: "Inter Tight", system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.hero-glow {
+  background:
+    radial-gradient(ellipse 60% 50% at 75% 35%, rgba(249, 115, 22, 0.32) 0%, rgba(249, 115, 22, 0) 60%),
+    linear-gradient(180deg, #0a1628 0%, #0a1628 100%);
+}
+
+.placeholder-stripes {
+  background-image:
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0 8px, rgba(255, 255, 255, 0) 8px 16px),
+    linear-gradient(180deg, #1f2a3d 0%, #15202f 100%);
+}
+
+.placeholder-stripes-light {
+  background-image:
+    repeating-linear-gradient(135deg, rgba(10, 22, 40, 0.06) 0 8px, rgba(10, 22, 40, 0) 8px 16px),
+    linear-gradient(180deg, #ede7dc 0%, #e3dcd0 100%);
+}
