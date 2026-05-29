@@ -1,0 +1,94 @@
+Pour l’instant, retire complètement la logique Supabase du formulaire d’évaluation.
+
+Objectif :
+Finaliser le questionnaire et envoyer les informations par courriel seulement.
+
+Ne pas utiliser :
+- Supabase
+- Supabase Storage
+- Edge Function Supabase
+- insertion dans la base de données
+- création de projet automatique
+
+Conserver :
+- le design actuel du formulaire
+- le multi-step
+- l’upload multiple de fichiers
+- les validations
+- le message de succès
+
+Modifier le questionnaire pour inclure :
+
+1. Coordonnées
+- Prénom
+- Nom
+- Courriel
+- Téléphone
+
+2. Entreprise
+- Nom de l’entreprise
+- Secteur d’activité
+- Ville
+- Avez-vous déjà un site web ? Oui / Non
+- Site web actuel si Oui
+- Réseaux sociaux optionnel
+- Possédez-vous déjà un logo ? Oui / Non
+
+3. Besoins
+- Type de projet : Modernisation / Conception
+- Si Modernisation : afficher les forfaits Modernisation
+- Si Conception : afficher les forfaits Conception
+- Que souhaitez-vous faire ?
+  - Site web
+  - Logo
+  - Site + logo
+  - Médias sociaux
+  - Je ne suis pas certain
+
+Forfaits Modernisation :
+- Modernisation Essentielle — 399,99 $
+- Modernisation Plus — 499,99 $
+- Modernisation Pro — 799,99 $
+- Modernisation Complète — 999,99 $
+
+Forfaits Conception :
+- Démarrage — 599,99 $
+- Entreprise — 899,99 $
+- Professionnel — 1 299,99 $
+- Signature — 1 999,99 $
+
+4. Détails
+- Message libre
+- Inspirations visuelles : liens de sites, logos ou entreprises dont le client aime le style
+- Upload fichiers multiples :
+  - logo
+  - capture d’écran
+  - croquis
+  - image de référence
+  - PDF
+
+Formats acceptés :
+- PNG
+- JPG
+- JPEG
+- WEBP
+- PDF
+- SVG
+
+Limites :
+- maximum 10 fichiers
+- maximum 10 Mo par fichier
+
+À la soumission :
+- envoyer un courriel structuré à Signa avec toutes les réponses
+- inclure les fichiers joints si possible
+- sinon inclure la liste des fichiers sélectionnés
+
+Sujet du courriel :
+Nouvelle demande d’évaluation gratuite — Signa
+
+Message succès :
+Votre demande a été envoyée avec succès. Signa analysera votre présence en ligne et vous contactera rapidement.
+
+Vérifier que :
+npm run build fonctionne.
