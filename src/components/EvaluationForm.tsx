@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { submitEvaluation, type EvaluationFormData } from '../lib/submitEvaluation';
 import { Icons } from './Icons';
@@ -25,7 +25,7 @@ const SECTORS = [
   'Autre',
 ];
 
-const STEPS = ['Coordonnées', 'Entreprise', 'Besoins', 'Détails'];
+const STEPS = ['Coordonnées', 'Entreprise', 'Besoins'];
 
 type Props = {
   isOpen: boolean;
@@ -62,8 +62,6 @@ export const EvaluationForm = ({ isOpen, onClose, preselectedPackage }: Props) =
   const [state, setState] = useState<State>('idle');
   const [errorMsg, setErrorMsg] = useState('');
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<keyof EvaluationFormData, string>>>({});
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
   if (!isOpen) return null;
 
   const set = <K extends keyof EvaluationFormData>(key: K, value: EvaluationFormData[K]) => {
@@ -103,6 +101,8 @@ export const EvaluationForm = ({ isOpen, onClose, preselectedPackage }: Props) =
       setFieldErrors(errors);
       return;
     }
+    setState('idle');
+    setErrorMsg('');
     setDirection(1);
     setStep((s) => s + 1);
   };
@@ -110,6 +110,8 @@ export const EvaluationForm = ({ isOpen, onClose, preselectedPackage }: Props) =
   const goPrev = () => {
     setDirection(-1);
     setStep((s) => s - 1);
+    setState('idle');
+    setErrorMsg('');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -300,26 +302,10 @@ export const EvaluationForm = ({ isOpen, onClose, preselectedPackage }: Props) =
                     </>
                   )}
 
-                  {step === 3 && (
-                    <>
-                      <div className="space-y-3">
-                        <h4 className="text-brand font-semibold tracking-[0.15em] text-[11px]">MESSAGE (OPTIONNEL)</h4>
-                        <textarea value={form.message} onChange={(e) => set('message', e.target.value)} rows={3} placeholder="Tout autre détail utile pour votre évaluation..." className={inputCls(false) + ' resize-none w-full'} />
-                      </div>
-                      <div className="space-y-3">
-                        <h4 className="text-brand font-semibold tracking-[0.15em] text-[11px]">FICHIERS (OPTIONNEL)</h4>
-                        <p className="text-white/50 text-[13px]">Logo actuel, captures d'écran, références...</p>
-                        <input ref={fileInputRef} type="file" multiple accept="image/*,.pdf" className="hidden" onChange={(e) => set('files', Array.from(e.target.files ?? []))} />
-                        <button type="button" onClick={() => fileInputRef.current?.click()} className="w-full py-3 rounded-xl border border-dashed border-white/20 hover:border-white/40 text-white/60 hover:text-white/80 text-[14px] transition-colors cursor-pointer">
-                          {form.files.length > 0 ? `${form.files.length} fichier(s) sélectionné(s)` : '+ Ajouter des fichiers'}
-                        </button>
-                      </div>
-                      {state === 'error' && (
-                        <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-[14px]">
-                          {errorMsg}
-                        </div>
-                      )}
-                    </>
+                  {step === 2 && state === 'error' && (
+                    <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-[14px]">
+                      {errorMsg}
+                    </div>
                   )}
                 </motion.div>
               </AnimatePresence>
