@@ -6,6 +6,7 @@ import HomeScreen from './components/HomeScreen';
 import ProspectsScreen from './components/ProspectsScreen';
 import PipelineScreen from './components/PipelineScreen';
 import StubScreen from './components/StubScreen';
+import ProjectDashboardPage from './features/portal/presentation/ProjectDashboardPage';
 import MobileView from './components/MobileView';
 import ProspectDrawer from './components/ProspectDrawer';
 import NewProspectModal from './components/NewProspectModal';
@@ -65,6 +66,7 @@ function MainScreen() {
   if (screen === 'accueil') return <HomeScreen />;
   if (screen === 'prospects') return <ProspectsScreen />;
   if (screen === 'pipeline') return <PipelineScreen />;
+  if (screen === 'projet') return <ProjectDashboardPage />;
   return <StubScreen />;
 }
 

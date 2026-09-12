@@ -1,7 +1,6 @@
 import { useAppActions, useAppState } from '../AppContext';
 
 const TITLES: Record<string, string> = {
-  projet: 'Suivi du projet web',
   fichiers: 'Fichiers',
   contacts: 'Contacts',
   taches: 'Tâches',

@@ -24,7 +24,19 @@
 - [x] DNS `app.signaweb.ca` corrigé et stable — 2026-09-12
 - [x] Parcours complet testé en vrai navigateur (Playwright/Chromium contre `app.signaweb.ca` en production) : redirection non-authentifié, mauvais mot de passe (message d'erreur affiché), bon login, création d'organisation, bascule vers le CRM, navigation Prospects/Pipeline, session qui persiste après reload — tout conforme — 2026-09-12
 
-## À faire (avant Phase 1)
+## Terminées (Phase 1) — 2026-09-12
+
+- [x] Migrations `web_projects`, `project_steps`, `project_files`, `revision_requests`, `approvals` + RLS (`is_project_member`/`is_project_admin`)
+- [x] Trigger : la création d'une organisation crée automatiquement son `web_project` (statut `awaiting_information`) + les 6 étapes standard — comble temporairement l'absence de Phase 2 (Signa qui crée le projet manuellement)
+- [x] RPC `approve_project_version` : refuse si le projet n'est pas en `private_review`, insère l'approbation (immuable) et passe le projet à `approved`, le tout protégé par RLS (pas de security definer nécessaire)
+- [x] Bucket Storage `project-files` (privé, chemin `{organization_id}/{web_project_id}/...`), RLS storage.objects par organisation
+- [x] `features/portal` : `ProjectDashboardPage` (progression, version privée + approbation, fichiers, corrections, historique), branchée sur l'écran "Suivi du projet" du prototype existant
+- [x] Vérifié par script (isolation RLS tables + storage entre 2 organisations) et en vrai navigateur (Playwright, production) : demande de correction, téléversement de fichier, passage en révision privée (simulé côté Signa via service role), approbation réelle confirmée en base
+
+## À faire (avant Phase 2)
 
 - [ ] Décider si l'inscription libre (`/inscription`) reste ouverte au public ou si elle doit être retirée avant le pilote (le MVP prévoit que Signa crée les comptes après paiement, pas un self-signup)
 - [ ] Configurer un vrai fournisseur SMTP (Resend, comme `reca-app-v3`) dans Supabase Auth — le SMTP par défaut limite l'envoi de courriels de confirmation/réinitialisation à quelques par heure
+- [ ] `project_steps` reste toujours à `pending` : rien ne les fait passer à `in_progress`/`done` pour l'instant — ce sera une action de l'administration Signa (Phase 2), pas du client
+- [ ] Les transitions de `web_projects.status` (`content_review` → `in_production` → `private_review` → …) ne sont exposées nulle part côté client par design (seul `approve_project_version` peut faire avancer un statut, et seulement `private_review` → `approved`) — Phase 2 doit fournir la console qui les pilote (aujourd'hui seul le service role peut le faire, utilisé pour les tests)
+- [ ] Notifications essentielles (accès créé, version prête, réponse correction, approbation demandée, site en ligne) pas encore implémentées — prévues avec un Edge Function d'envoi courriel (patron `resend-webhook` de `reca-app-v3`)

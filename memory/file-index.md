@@ -32,6 +32,14 @@
 - `infrastructure/supabase/SupabaseOrganizationRepository.ts`
 - `presentation/CreateOrganizationPage.tsx` — onboarding temporaire (self-service), à revoir en Phase 2 (création par Signa après paiement)
 
+## `src/features/portal/` (Phase 1)
+
+- `domain/project.ts` — `WebProject`, `ProjectStep`, `ProjectFile`, `RevisionRequest`, `Approval`, statuts et libellés français
+- `application/ProjectRepository.ts` — interface (port)
+- `infrastructure/supabase/SupabaseProjectRepository.ts` — `getBundle`, `submitRevisionRequest`, `approveVersion` (RPC), `uploadFile` (Storage + ligne `project_files`)
+- `presentation/useProjectBundle.ts` — hook de chargement/rechargement
+- `presentation/ProjectDashboardPage.tsx` — page réelle branchée sur l'écran "Suivi du projet" (`App.tsx`, remplace le stub)
+
 ## `src/components/` (prototype visuel CRM — Phase 3 les branchera à Supabase, sans refonte)
 
 - `Sidebar.tsx`, `Header.tsx` — layout bureau
@@ -57,6 +65,8 @@
 - `migrations/20260912120000_core_organizations.sql` — organizations, memberships, invitations, RLS, `is_org_member`/`is_org_admin`
 - `migrations/20260912121500_current_app_session.sql` — RPC `current_app_session()`
 - `migrations/20260912123000_organizations_created_by.sql` — correctif RLS (colonne `created_by`)
+- `migrations/20260912140000_portal_web_projects.sql` — web_projects, project_steps, project_files, revision_requests, approvals, RLS, auto-création du projet à la création d'une organisation
+- `migrations/20260912141500_portal_approval_and_storage.sql` — RPC `approve_project_version`, bucket Storage `project-files` + RLS storage.objects
 
 ## Infrastructure (hors dépôt Git)
 
