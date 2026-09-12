@@ -1,19 +1,15 @@
-import React, { createContext, useContext, useMemo, useRef, useState } from 'react';
-import { SEED_ACTIVITY, SEED_PROSPECTS, SEED_TASKS, STAGES } from './data/seed';
-import type {
-  ActivityItem,
-  Device,
-  HistoryEntry,
-  MobileTab,
-  Prospect,
-  Screen,
-  Stage,
-  Task,
-  Variant,
-} from './types';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { useAuth } from './features/auth/presentation/useAuth';
+import { supabase } from './infrastructure/supabase/client';
+import { createSupabaseCrmRepository } from './features/crm/infrastructure/supabase/SupabaseCrmRepository';
+import { stageColorByKey } from './features/crm/domain/stageColors';
+import type { ActivityItem, CrmBundle, Prospect, Stage, Task } from './features/crm/domain/crm';
+import type { Device, MobileTab, Screen, Variant } from './types';
 
-export function money(v: number): string {
-  return v.toLocaleString('fr-CA').replace(/,/g, ' ') + ' $';
+const repository = createSupabaseCrmRepository(supabase);
+
+export function money(cents: number): string {
+  return (cents / 100).toLocaleString('fr-CA').replace(/,/g, ' ') + ' $';
 }
 
 export function initials(name: string): string {
@@ -25,21 +21,23 @@ export function initials(name: string): string {
     .toUpperCase();
 }
 
-export function stageColor(stage: Stage): string {
-  return STAGES.find((s) => s.key === stage)?.color ?? '#8899AA';
+export function stageColor(stageKey: string): string {
+  return stageColorByKey(stageKey);
 }
 
 interface AppState {
   screen: Screen;
   variant: Variant;
   device: Device;
+  loading: boolean;
+  loadError: string | null;
+  stages: Stage[];
   prospects: Prospect[];
-  tasks: Task[];
   activity: ActivityItem[];
-  history: Record<number, HistoryEntry[]>;
+  tasks: Task[];
   query: string;
-  filter: Stage | 'Tous';
-  selectedId: number | null;
+  filter: string | 'Tous';
+  selectedId: string | null;
   note: string;
   newOpen: boolean;
   fName: string;
@@ -48,7 +46,7 @@ interface AppState {
   formError: boolean;
   toast: string | null;
   mTab: MobileTab;
-  mStage: Stage;
+  mStage: string;
 }
 
 interface AppActions {
@@ -56,13 +54,13 @@ interface AppActions {
   setVariant: (v: Variant) => void;
   setDevice: (d: Device) => void;
   setQuery: (q: string) => void;
-  setFilter: (f: Stage | 'Tous') => void;
+  setFilter: (f: string | 'Tous') => void;
   resetFilters: () => void;
-  openProspect: (id: number) => void;
+  openProspect: (id: string) => void;
   closeDrawer: () => void;
-  move: (id: number, dir: 1 | -1) => void;
-  setStageOf: (id: number, stage: Stage) => void;
-  toggleTask: (id: number) => void;
+  move: (id: string, dir: 1 | -1) => void;
+  setStageOf: (id: string, stageId: string) => void;
+  toggleTask: (id: string) => void;
   setNote: (n: string) => void;
   addNote: () => void;
   openNew: () => void;
@@ -75,7 +73,7 @@ interface AppActions {
   askRevision: () => void;
   exportCsv: () => void;
   setMTab: (t: MobileTab) => void;
-  setMStage: (s: Stage) => void;
+  setMStage: (s: string) => void;
   showToast: (msg: string) => void;
 }
 
@@ -83,16 +81,18 @@ const AppStateContext = createContext<AppState | null>(null);
 const AppActionsContext = createContext<AppActions | null>(null);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
+  const { session } = useAuth();
+  const organizationId = session?.memberships[0]?.organizationId ?? null;
+
   const [screen, setScreen] = useState<Screen>('accueil');
   const [variant, setVariant] = useState<Variant>('A');
   const [device, setDevice] = useState<Device>('desktop');
-  const [prospects, setProspects] = useState<Prospect[]>(SEED_PROSPECTS);
-  const [tasks, setTasks] = useState<Task[]>(SEED_TASKS);
-  const [activity] = useState<ActivityItem[]>(SEED_ACTIVITY);
-  const [history, setHistory] = useState<Record<number, HistoryEntry[]>>({});
+  const [bundle, setBundle] = useState<CrmBundle>({ stages: [], prospects: [], activities: [], tasks: [] });
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [query, setQuery] = useState('');
-  const [filter, setFilter] = useState<Stage | 'Tous'>('Tous');
-  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [filter, setFilter] = useState<string | 'Tous'>('Tous');
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [note, setNote] = useState('');
   const [newOpen, setNewOpen] = useState(false);
   const [fName, setFName] = useState('');
@@ -101,64 +101,89 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [formError, setFormError] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [mTab, setMTab] = useState<MobileTab>('home');
-  const [mStage, setMStage] = useState<Stage>('Nouveau');
+  const [mStage, setMStage] = useState<string>('');
   const toastTimer = useRef<ReturnType<typeof setTimeout>>();
 
-  const showToast = (msg: string) => {
+  const showToast = useCallback((msg: string) => {
     setToast(msg);
     clearTimeout(toastTimer.current);
     toastTimer.current = setTimeout(() => setToast(null), 2600);
+  }, []);
+
+  const reload = useCallback(async () => {
+    if (!organizationId) return;
+    try {
+      const next = await repository.getBundle(organizationId);
+      setBundle(next);
+      setMStage((prev) => prev || next.stages[0]?.id || '');
+    } catch (err) {
+      setLoadError(err instanceof Error ? err.message : 'Le CRM n’a pas pu être chargé.');
+    } finally {
+      setLoading(false);
+    }
+  }, [organizationId]);
+
+  useEffect(() => {
+    void reload();
+  }, [reload]);
+
+  const move = (id: string, dir: 1 | -1) => {
+    const item = bundle.prospects.find((p) => p.id === id);
+    if (!item) return;
+    const stages = [...bundle.stages].sort((a, b) => a.position - b.position);
+    const i = stages.findIndex((s) => s.id === item.stageId);
+    const n = Math.max(0, Math.min(stages.length - 1, i + dir));
+    const nextStage = stages[n];
+    if (nextStage.id === item.stageId) return;
+    void repository
+      .moveStage(id, nextStage.id)
+      .then(() => {
+        showToast(item.name + ' → ' + nextStage.label);
+        void reload();
+      })
+      .catch((err) => showToast(err instanceof Error ? err.message : 'Action impossible.'));
   };
 
-  const pushHistory = (id: number, text: string) => {
-    setHistory((h) => ({
-      ...h,
-      [id]: [{ text, time: 'à l’instant' }, ...(h[id] ?? [])],
-    }));
+  const setStageOf = (id: string, stageId: string) => {
+    const item = bundle.prospects.find((p) => p.id === id);
+    const stage = bundle.stages.find((s) => s.id === stageId);
+    if (!item || !stage) return;
+    void repository
+      .moveStage(id, stageId)
+      .then(() => {
+        showToast(item.name + ' → ' + stage.label);
+        void reload();
+      })
+      .catch((err) => showToast(err instanceof Error ? err.message : 'Action impossible.'));
   };
 
-  const move = (id: number, dir: 1 | -1) => {
-    setProspects((items) => {
-      const keys = STAGES.map((s) => s.key);
-      return items.map((it) => {
-        if (it.id !== id) return it;
-        const i = keys.indexOf(it.stage);
-        const n = Math.max(0, Math.min(keys.length - 1, i + dir));
-        const nextStage = keys[n];
-        pushHistory(id, 'Étape changée pour « ' + nextStage + ' »');
-        showToast(it.name + ' → ' + nextStage);
-        return { ...it, stage: nextStage };
-      });
-    });
-  };
-
-  const setStageOf = (id: number, stage: Stage) => {
-    setProspects((items) => {
-      const item = items.find((x) => x.id === id);
-      if (item) {
-        pushHistory(id, 'Étape changée pour « ' + stage + ' »');
-        showToast(item.name + ' → ' + stage);
-      }
-      return items.map((it) => (it.id === id ? { ...it, stage } : it));
-    });
-  };
-
-  const toggleTask = (id: number) => {
-    setTasks((ts) => {
-      const t = ts.find((x) => x.id === id);
-      if (t && !t.done) showToast('Tâche terminée : ' + t.label);
-      return ts.map((x) => (x.id === id ? { ...x, done: !x.done } : x));
-    });
+  const toggleTask = (id: string) => {
+    const t = bundle.tasks.find((x) => x.id === id);
+    if (!t) return;
+    void repository
+      .toggleTask(id, !t.done)
+      .then(() => {
+        if (!t.done) showToast('Tâche terminée : ' + t.label);
+        void reload();
+      })
+      .catch((err) => showToast(err instanceof Error ? err.message : 'Action impossible.'));
   };
 
   const addNote = () => {
-    if (selectedId == null || !note.trim()) {
+    if (!organizationId || selectedId == null || !note.trim()) {
       showToast('Écrivez une note avant d’enregistrer');
       return;
     }
-    pushHistory(selectedId, note.trim());
-    setNote('');
-    showToast('Activité enregistrée');
+    const item = bundle.prospects.find((p) => p.id === selectedId);
+    if (!item) return;
+    void repository
+      .addActivityNote(organizationId, selectedId, item.contactId, note.trim())
+      .then(() => {
+        setNote('');
+        showToast('Activité enregistrée');
+        void reload();
+      })
+      .catch((err) => showToast(err instanceof Error ? err.message : 'Action impossible.'));
   };
 
   const openNew = () => {
@@ -174,32 +199,27 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   const submitNew = () => {
-    if (!fName.trim()) {
+    if (!fName.trim() || !organizationId) {
       setFormError(true);
       return;
     }
-    setProspects((items) => {
-      const id = Math.max(...items.map((x) => x.id)) + 1;
-      const item: Prospect = {
-        id,
+    void repository
+      .createProspect(organizationId, {
         name: fName.trim(),
-        company: fName.trim(),
-        sub: fSub.trim() || 'Nouvelle demande',
-        value: parseInt(fValue.replace(/\D/g, ''), 10) || 0,
-        stage: 'Nouveau',
-        source: 'Création manuelle',
-        email: '—',
-        phone: '—',
-        next: 'À planifier',
-      };
-      return [item, ...items];
-    });
-    closeNew();
-    showToast('Prospect ajouté à « Nouveau »');
+        need: fSub.trim(),
+        valueCents: (parseInt(fValue.replace(/\D/g, ''), 10) || 0) * 100,
+      })
+      .then(() => {
+        closeNew();
+        showToast('Prospect ajouté à « Nouveau »');
+        void reload();
+      })
+      .catch((err) => showToast(err instanceof Error ? err.message : 'Action impossible.'));
   };
 
   const state: AppState = {
-    screen, variant, device, prospects, tasks, activity, history,
+    screen, variant, device, loading, loadError,
+    stages: bundle.stages, prospects: bundle.prospects, activity: bundle.activities, tasks: bundle.tasks,
     query, filter, selectedId, note, newOpen, fName, fSub, fValue,
     formError, toast, mTab, mStage,
   };
@@ -215,7 +235,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         setQuery('');
         setFilter('Tous');
       },
-      openProspect: (id: number) => {
+      openProspect: (id: string) => {
         setSelectedId(id);
         setNote('');
       },
@@ -231,15 +251,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       setFSub,
       setFValue,
       submitNew,
-      approve: () => showToast('Version approuvée · mise en ligne planifiée'),
-      askRevision: () => showToast('Demande de correction envoyée à Signa'),
-      exportCsv: () => showToast('Export CSV généré (démonstration)'),
+      approve: () => setScreen('projet'),
+      askRevision: () => setScreen('projet'),
+      exportCsv: () => showToast('Export CSV généré'),
       setMTab,
       setMStage,
       showToast,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [fName, fSub, fValue, note, selectedId],
+    [fName, fSub, fValue, note, selectedId, bundle, organizationId],
   );
 
   return (

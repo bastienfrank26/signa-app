@@ -49,7 +49,16 @@
 - `presentation/RequireStaff.tsx` — garde de route (affiche "Accès refusé" si non-personnel)
 - `presentation/AdminLayout.tsx`, `OrganizationsListPage.tsx`, `OrganizationDetailPage.tsx`, `AuditLogPage.tsx`, `ReasonDialog.tsx` (motif obligatoire réutilisable)
 
-## `src/components/` (prototype visuel CRM — Phase 3 les branchera à Supabase, sans refonte)
+## `src/features/crm/` (Phase 3)
+
+- `domain/crm.ts` — `Stage`, `Prospect` (= opportunité + contact joints), `ActivityItem`, `Task`, `CrmBundle`
+- `domain/stageColors.ts` — couleur par `stage_key` (front seulement, pas en base)
+- `domain/format.ts` — `formatNextFollowUp`, `formatRelativeTime`
+- `application/CrmRepository.ts` — interface (port)
+- `infrastructure/supabase/SupabaseCrmRepository.ts` — `getBundle`, `createProspect` (contact + opportunité), `moveStage`, `addActivityNote`, `toggleTask`
+- Pas de dossier `presentation/` propre : le CRM réutilise directement les composants du prototype (`src/components/*`), désormais alimentés par `AppContext.tsx` au lieu de `data/seed.ts` (supprimé)
+
+## `src/components/` (prototype visuel CRM — branché à Supabase depuis la Phase 3 via `AppContext.tsx`, sans refonte visuelle)
 
 - `Sidebar.tsx`, `Header.tsx` — layout bureau
 - `HomeScreen.tsx` — accueil, variantes A (focus) et B (vue d'ensemble)
@@ -79,6 +88,7 @@
 - `migrations/20260912150000_admin_internal_staff.sql` — `internal_staff`, `audit_events`, `organizations.status`, policies staff (lecture cross-org) et garde de suspension sur les écritures client
 - `migrations/20260912151500_admin_actions.sql` — RPC admin (`admin_set_organization_status`, `admin_set_project_status`, `admin_set_step_status`, `admin_update_membership`), motif obligatoire + audit
 - `migrations/20260912152000_admin_membership_emails.sql` — RPC `admin_organization_memberships` (courriels des membres pour le personnel Signa)
+- `migrations/20260912160000_crm_core.sql` — pipelines, pipeline_stages, contacts, opportunities, activities, tasks, RLS (`is_org_writer` bloque le rôle readonly), pipeline par défaut auto-créé, activité automatique gagné/perdu
 
 ## Infrastructure (hors dépôt Git)
 

@@ -45,9 +45,6 @@ function DeviceToggle() {
           S
         </span>
         Signa
-        <span style={{ padding: '3px 8px', borderRadius: 999, background: '#1D2E42', color: '#8899AA', fontSize: 11, fontWeight: 600 }}>
-          Données de démonstration
-        </span>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#1D2E42', padding: 4, borderRadius: 10 }}>
         <button onClick={() => setDevice('desktop')} style={pillDark(device === 'desktop')}>

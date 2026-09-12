@@ -1,12 +1,15 @@
-import { money, useAppActions, useAppState } from '../AppContext';
-import { STAGES } from '../data/seed';
+import { money, stageColor, useAppActions, useAppState } from '../AppContext';
 import ProspectCard from './ProspectCard';
 
 export default function PipelineScreen() {
-  const { prospects } = useAppState();
+  const { prospects, stages } = useAppState();
   const { openNew } = useAppActions();
-  const active = prospects.filter((p) => p.stage !== 'Gagné' && p.stage !== 'Perdu');
-  const activeTotal = active.reduce((a, b) => a + b.value, 0);
+  const ordered = [...stages].sort((a, b) => a.position - b.position);
+  const active = prospects.filter((p) => {
+    const stage = stages.find((s) => s.id === p.stageId);
+    return stage && !stage.isWon && !stage.isLost;
+  });
+  const activeTotal = active.reduce((a, b) => a + b.valueCents, 0);
 
   return (
     <div>
@@ -25,23 +28,24 @@ export default function PipelineScreen() {
         </button>
       </div>
       <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start', overflowX: 'auto', paddingBottom: 12 }}>
-        {STAGES.map((st) => {
-          const items = prospects.filter((p) => p.stage === st.key);
-          const total = items.reduce((a, b) => a + b.value, 0);
+        {ordered.map((st) => {
+          const items = prospects.filter((p) => p.stageId === st.id);
+          const total = items.reduce((a, b) => a + b.valueCents, 0);
+          const color = stageColor(st.key);
           return (
-            <div key={st.key} style={{ width: 252, flex: 'none', borderRadius: 14, background: '#fff', border: '1px solid var(--sg-border)', padding: 14 }}>
+            <div key={st.id} style={{ width: 252, flex: 'none', borderRadius: 14, background: '#fff', border: '1px solid var(--sg-border)', padding: 14 }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-                  <span style={{ width: 8, height: 8, borderRadius: '50%', display: 'inline-block', background: st.color }} />
-                  <span style={{ fontSize: 13.5, fontWeight: 800 }}>{st.key}</span>
+                  <span style={{ width: 8, height: 8, borderRadius: '50%', display: 'inline-block', background: color }} />
+                  <span style={{ fontSize: 13.5, fontWeight: 800 }}>{st.label}</span>
                   <span style={{ fontSize: 12, color: '#9AA6B2', fontWeight: 700 }}>{items.length}</span>
                 </div>
                 <span style={{ fontSize: 12.5, fontWeight: 700, color: '#5D6B7B' }}>{money(total)}</span>
               </div>
-              <div style={{ height: 3, borderRadius: 2, marginBottom: 12, background: st.color + '33' }} />
+              <div style={{ height: 3, borderRadius: 2, marginBottom: 12, background: color + '33' }} />
               <div style={{ display: 'flex', flexDirection: 'column', gap: 9, minHeight: 60 }}>
                 {items.map((p, i) => (
-                  <ProspectCard key={p.id} p={p} idx={p.id + i} />
+                  <ProspectCard key={p.id} p={p} idx={i} />
                 ))}
                 {items.length === 0 && (
                   <div style={{ border: '1px dashed var(--sg-border-strong)', borderRadius: 11, padding: '18px 12px', textAlign: 'center', fontSize: 12.5, color: '#9AA6B2' }}>

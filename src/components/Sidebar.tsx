@@ -1,6 +1,14 @@
-import { useAppActions, useAppState } from '../AppContext';
+import { initials, useAppActions, useAppState } from '../AppContext';
+import { useAuth } from '../features/auth/presentation/useAuth';
 import { navStyle } from '../ui';
 import type { Screen } from '../types';
+
+const roleLabels: Record<string, string> = {
+  owner: 'Propriétaire',
+  admin: 'Administrateur',
+  member: 'Employé',
+  readonly: 'Lecture seule',
+};
 
 const badgeStyle = {
   minWidth: 20,
@@ -29,6 +37,13 @@ function NavButton({ label, screen, badge }: { label: string; screen: Screen; ba
 }
 
 export default function Sidebar() {
+  const { prospects, stages, tasks } = useAppState();
+  const { session } = useAuth();
+  const membership = session?.memberships[0];
+  const newStage = [...stages].sort((a, b) => a.position - b.position)[0];
+  const newCount = newStage ? prospects.filter((p) => p.stageId === newStage.id).length : 0;
+  const tasksLeft = tasks.filter((t) => !t.done).length;
+
   return (
     <aside
       style={{
@@ -76,7 +91,7 @@ export default function Sidebar() {
             MON SITE
           </div>
           <NavButton label="Accueil" screen="accueil" />
-          <NavButton label="Suivi du projet" screen="projet" badge={2} />
+          <NavButton label="Suivi du projet" screen="projet" />
           <NavButton label="Fichiers" screen="fichiers" />
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
@@ -91,10 +106,10 @@ export default function Sidebar() {
           >
             CRM
           </div>
-          <NavButton label="Prospects" screen="prospects" badge={3} />
+          <NavButton label="Prospects" screen="prospects" badge={newCount || undefined} />
           <NavButton label="Pipeline" screen="pipeline" />
           <NavButton label="Contacts" screen="contacts" />
-          <NavButton label="Tâches" screen="taches" badge={2} />
+          <NavButton label="Tâches" screen="taches" badge={tasksLeft || undefined} />
         </div>
       </nav>
 
@@ -123,11 +138,13 @@ export default function Sidebar() {
               fontSize: 13,
             }}
           >
-            E
+            {membership ? initials(membership.organizationName) : '—'}
           </span>
-          <div style={{ lineHeight: 1.25 }}>
-            <div style={{ fontSize: 13, fontWeight: 700 }}>Entreprise ABC</div>
-            <div style={{ fontSize: 11, color: 'var(--sg-side-muted)' }}>Forfait Entreprise</div>
+          <div style={{ lineHeight: 1.25, minWidth: 0 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {membership?.organizationName ?? '—'}
+            </div>
+            <div style={{ fontSize: 11, color: 'var(--sg-side-muted)' }}>{membership ? roleLabels[membership.role] ?? membership.role : ''}</div>
           </div>
         </div>
         <div style={{ padding: 12, borderRadius: 12, border: '1px solid #24384f', lineHeight: 1.35 }}>

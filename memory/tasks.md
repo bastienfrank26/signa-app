@@ -42,7 +42,23 @@
 - [x] `features/admin` : console séparée (`/admin/organisations`, `/admin/organisations/:id`, `/admin/audit`), gardée par `RequireStaff` — un client normal qui y va voit "Accès refusé"
 - [x] Vérifié par script (isolation cross-org, garde-fous de rôle, blocage/déblocage d'accès, audit) et en navigateur réel (Playwright, production) : suspension, réactivation, changement de statut de projet, étape marquée terminée, tout confirmé en base
 
-## À faire (avant Phase 3)
+## Terminées (Phase 3) — 2026-09-12
+
+- [x] Migrations `pipelines`/`pipeline_stages`/`contacts`/`opportunities`/`activities`/`tasks`, RLS par organisation (`is_org_member`/`is_org_writer` — un membre `readonly` ne peut rien écrire), suspension bloque aussi les écritures CRM
+- [x] Pipeline par défaut (6 étapes standard) auto-créé à la création d'une organisation, même patron que le projet web (Phase 1)
+- [x] Trigger : gagner ou perdre une opportunité (changement vers une étape `is_won`/`is_lost`) génère automatiquement une activité, sans code applicatif
+- [x] `features/crm` (domain/application/infrastructure/presentation) branché sur les composants visuels existants du prototype (`HomeScreen`, `ProspectsScreen`, `PipelineScreen`, `ProspectCard`, `ProspectDrawer`, `MobileView`) — **aucune refonte visuelle**, seulement le remplacement de `data/seed.ts` par de vraies requêtes Supabase dans `AppContext.tsx`
+- [x] `data/seed.ts` supprimé (plus de données de démonstration mélangées à l'app réelle, conforme à AGENTS.md)
+- [x] Nettoyage de vrais faux-semblants trouvés en cours de route : badge "Données de démonstration" retiré, nom/rôle d'organisation dans la sidebar et le header maintenant réels (étaient codés en dur : "Entreprise ABC", "Francis Roy"), la carte "Prochaine action" (accueil + mobile) montre le vrai statut du projet au lieu d'un texte fictif ("Approuver la page « À propos »" codé en dur, qui causait d'ailleurs une collision de bouton avec le vrai bouton d'approbation du portail — trouvé pendant les tests Phase 1)
+- [x] Vérifié par script (isolation, rôle readonly bloqué en écriture, activité automatique gagné/perdu, blocage si compte suspendu) et en navigateur réel (Playwright, production) : ajout de prospect, activité, avancement d'étape, tout confirmé en base
+
+## Écarts assumés par rapport à la doc (Phase 3)
+
+- Pas de table `companies` séparée : `contacts.company_name` est un simple texte dénormalisé (le prototype ne distinguait pas les deux). Suffisant tant qu'une entreprise n'a pas besoin de plusieurs contacts liés ; à revisiter si ce besoin apparaît.
+- Les couleurs d'étape de pipeline sont codées en front (`features/crm/domain/stageColors.ts`, par `stage_key`), pas en base — un pipeline renommé/réordonné reste fonctionnel mais une étape avec une clé inconnue retombe sur une couleur neutre.
+- `useProjectBundle` est appelé indépendamment à plusieurs endroits d'un même écran (accueil) — plusieurs requêtes réseau redondantes. Fonctionnel, mais un cache partagé (ex. React Query) serait plus efficace si l'app grossit.
+
+## À faire (avant Phase 4)
 
 - [ ] Console admin ne permet pas encore de créer une organisation pour un client (le flux MVP réel : "Signa crée le compte après paiement", avec invitation) — reporté, dépend de la table `invitations` (existe depuis Phase 0, jamais utilisée) et d'un flux de rédemption côté client, non construits
 - [ ] Sections Modules/Sites/Abonnements de l'administration pas construites — aucune table ne les supporte encore (Phase 3/4/5)

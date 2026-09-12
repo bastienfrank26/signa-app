@@ -1,14 +1,14 @@
-import { money, initials, useAppActions } from '../AppContext';
+import { money, initials, useAppActions, useAppState } from '../AppContext';
 import { avatarStyle } from '../ui';
-import type { Prospect } from '../types';
-import { STAGES } from '../data/seed';
+import type { Prospect } from '../features/crm/domain/crm';
 
 export default function ProspectCard({ p, idx, mobile }: { p: Prospect; idx: number; mobile?: boolean }) {
   const { openProspect, move } = useAppActions();
-  const keys = STAGES.map((s) => s.key);
-  const i = keys.indexOf(p.stage);
+  const { stages } = useAppState();
+  const ordered = [...stages].sort((a, b) => a.position - b.position);
+  const i = ordered.findIndex((s) => s.id === p.stageId);
   const atStart = i <= 0;
-  const atEnd = i >= keys.length - 1;
+  const atEnd = i >= ordered.length - 1;
 
   const fwdStyle = {
     flex: 1,
@@ -59,14 +59,14 @@ export default function ProspectCard({ p, idx, mobile }: { p: Prospect; idx: num
         style={{ display: 'block', width: '100%', textAlign: 'left', border: 'none', background: 'none', padding: 0, cursor: 'pointer' }}
       >
         <div style={{ fontSize: 13.5, fontWeight: 700 }}>{p.name}</div>
-        <div style={{ fontSize: 11.5, color: '#7A8899', marginTop: 1 }}>{p.sub}</div>
+        <div style={{ fontSize: 11.5, color: '#7A8899', marginTop: 1 }}>{p.need}</div>
         <div style={{ marginTop: 7, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-          <span style={{ fontSize: 13, fontWeight: 800 }}>{money(p.value)}</span>
+          <span style={{ fontSize: 13, fontWeight: 800 }}>{money(p.valueCents)}</span>
           <span style={avatarStyle(idx, 24)}>{initials(p.company === 'Particulier' ? p.name : p.company)}</span>
         </div>
       </button>
       {mobile ? (
-        <button onClick={() => move(p.id, 1)} style={mFwdStyle}>
+        <button onClick={() => move(p.id, 1)} style={mFwdStyle} disabled={atEnd}>
           Avancer →
         </button>
       ) : (

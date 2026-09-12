@@ -1,21 +1,28 @@
-import { money, initials, useAppActions, useAppState } from '../AppContext';
+import { money, initials, stageColor, useAppActions, useAppState } from '../AppContext';
+import { formatNextFollowUp, formatRelativeTime } from '../features/crm/domain/format';
 import { avatarStyle, tag } from '../ui';
 
 export default function ProspectDrawer() {
-  const { prospects, selectedId, note, history } = useAppState();
+  const { prospects, stages, selectedId, note, activity } = useAppState();
   const { closeDrawer, move, setStageOf, setNote, addNote } = useAppActions();
   const sel = prospects.find((p) => p.id === selectedId);
   if (!sel) return null;
 
-  const advLabel = sel.stage === 'Gagné' ? 'Déjà gagné' : sel.stage === 'Perdu' ? 'Réactiver le dossier' : 'Avancer à l’étape suivante';
+  const ordered = [...stages].sort((a, b) => a.position - b.position);
+  const stage = stages.find((s) => s.id === sel.stageId);
+  const stageIndex = ordered.findIndex((s) => s.id === sel.stageId);
+
+  const advLabel = stage?.isWon ? 'Déjà gagné' : stage?.isLost ? 'Réactiver le dossier' : 'Avancer à l’étape suivante';
   const advance = () => {
-    if (sel.stage === 'Perdu') setStageOf(sel.id, 'Nouveau');
-    else if (sel.stage !== 'Gagné') move(sel.id, 1);
+    if (stage?.isLost) {
+      setStageOf(sel.id, ordered[0].id);
+    } else if (!stage?.isWon) {
+      move(sel.id, 1);
+    }
   };
-  const selHistory = [
-    ...(history[sel.id] ?? []),
-    { text: 'Prospect créé depuis ' + sel.source.toLowerCase(), time: '24 sept. · 9 h 12' },
-  ];
+  const lostStage = ordered.find((s) => s.isLost);
+
+  const selHistory = activity.filter((a) => a.opportunityId === sel.id);
 
   return (
     <div
@@ -38,7 +45,7 @@ export default function ProspectDrawer() {
       >
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
           <div style={{ display: 'flex', gap: 12, alignItems: 'center', minWidth: 0 }}>
-            <span style={avatarStyle(sel.id, 44)}>{initials(sel.company === 'Particulier' ? sel.name : sel.company)}</span>
+            <span style={avatarStyle(stageIndex, 44)}>{initials(sel.company === 'Particulier' ? sel.name : sel.company)}</span>
             <div style={{ minWidth: 0 }}>
               <div style={{ fontSize: 19, fontWeight: 800, letterSpacing: '-.02em' }}>{sel.name}</div>
               <div style={{ fontSize: 13, color: '#7A8899' }}>{sel.company}</div>
@@ -53,15 +60,15 @@ export default function ProspectDrawer() {
         </div>
 
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-          <span style={tag(sel.stage)}>{sel.stage}</span>
-          <span style={{ fontSize: 19, fontWeight: 800 }}>{money(sel.value)}</span>
+          {stage && <span style={tag(stageColor(stage.key))}>{stage.label}</span>}
+          <span style={{ fontSize: 19, fontWeight: 800 }}>{money(sel.valueCents)}</span>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-          <InfoBox label="SOURCE" value={sel.source} />
-          <InfoBox label="PROCHAIN SUIVI" value={sel.next} />
-          <InfoBox label="COURRIEL" value={sel.email} wrap />
-          <InfoBox label="TÉLÉPHONE" value={sel.phone} />
+          <InfoBox label="SOURCE" value={sel.source || '—'} />
+          <InfoBox label="PROCHAIN SUIVI" value={formatNextFollowUp(sel.nextFollowUpAt)} />
+          <InfoBox label="COURRIEL" value={sel.email || '—'} wrap />
+          <InfoBox label="TÉLÉPHONE" value={sel.phone || '—'} />
         </div>
 
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -71,12 +78,14 @@ export default function ProspectDrawer() {
           >
             {advLabel}
           </button>
-          <button
-            onClick={() => setStageOf(sel.id, 'Perdu')}
-            style={{ minHeight: 44, padding: '0 16px', borderRadius: 10, border: '1px solid #E7D3CF', background: '#fff', color: '#C0392B', fontSize: 13.5, fontWeight: 700, cursor: 'pointer' }}
-          >
-            Marquer perdu
-          </button>
+          {lostStage && (
+            <button
+              onClick={() => setStageOf(sel.id, lostStage.id)}
+              style={{ minHeight: 44, padding: '0 16px', borderRadius: 10, border: '1px solid #E7D3CF', background: '#fff', color: '#C0392B', fontSize: 13.5, fontWeight: 700, cursor: 'pointer' }}
+            >
+              Marquer perdu
+            </button>
+          )}
         </div>
 
         <div>
@@ -98,15 +107,16 @@ export default function ProspectDrawer() {
         <div>
           <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>Historique</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {selHistory.map((h, i) => (
-              <div key={i} style={{ display: 'flex', gap: 11 }}>
+            {selHistory.map((h) => (
+              <div key={h.id} style={{ display: 'flex', gap: 11 }}>
                 <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#C9C2B5', marginTop: 6, flex: 'none' }} />
                 <div style={{ lineHeight: 1.35 }}>
-                  <div style={{ fontSize: 13, fontWeight: 600 }}>{h.text}</div>
-                  <div style={{ fontSize: 11.5, color: '#9AA6B2' }}>{h.time}</div>
+                  <div style={{ fontSize: 13, fontWeight: 600 }}>{h.note}</div>
+                  <div style={{ fontSize: 11.5, color: '#9AA6B2' }}>{formatRelativeTime(h.createdAt)}</div>
                 </div>
               </div>
             ))}
+            {selHistory.length === 0 && <div style={{ fontSize: 12.5, color: '#9AA6B2' }}>Aucune activité pour ce prospect.</div>}
           </div>
         </div>
       </div>

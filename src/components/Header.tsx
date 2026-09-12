@@ -1,4 +1,17 @@
+import { useAuth } from '../features/auth/presentation/useAuth';
+import { initials } from '../AppContext';
+
+const roleLabels: Record<string, string> = {
+  owner: 'Propriétaire',
+  admin: 'Administrateur',
+  member: 'Employé',
+  readonly: 'Lecture seule',
+};
+
 export default function Header() {
+  const { session } = useAuth();
+  const membership = session?.memberships[0];
+
   return (
     <header
       style={{
@@ -28,20 +41,6 @@ export default function Header() {
         <span style={{ fontSize: 13 }}>⌕</span> Rechercher un contact, une tâche, un fichier…
       </div>
       <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 14 }}>
-        <span style={{ position: 'relative', fontSize: 16 }}>
-          🔔
-          <span
-            style={{
-              position: 'absolute',
-              top: 0,
-              right: -1,
-              width: 7,
-              height: 7,
-              borderRadius: '50%',
-              background: 'var(--sg-accent)',
-            }}
-          />
-        </span>
         <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
           <span
             style={{
@@ -57,11 +56,11 @@ export default function Header() {
               fontWeight: 700,
             }}
           >
-            FR
+            {session ? initials(session.email) : '—'}
           </span>
           <div style={{ lineHeight: 1.25 }}>
-            <div style={{ fontSize: 13, fontWeight: 700 }}>Francis Roy</div>
-            <div style={{ fontSize: 11, color: '#7A8899' }}>Propriétaire</div>
+            <div style={{ fontSize: 13, fontWeight: 700 }}>{session?.email ?? '—'}</div>
+            <div style={{ fontSize: 11, color: '#7A8899' }}>{membership ? roleLabels[membership.role] ?? membership.role : ''}</div>
           </div>
         </div>
       </div>

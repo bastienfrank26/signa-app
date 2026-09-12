@@ -1,11 +1,13 @@
-import { money, useAppActions, useAppState } from '../AppContext';
+import { initials, money, useAppActions, useAppState } from '../AppContext';
+import { useAuth } from '../features/auth/presentation/useAuth';
 import { mTabStyle } from '../ui';
-import { STAGES } from '../data/seed';
 import ProspectCard from './ProspectCard';
+import ProjectStatusCard from '../features/portal/presentation/ProjectStatusCard';
 
 export default function MobileView() {
   const { mTab } = useAppState();
   const { setMTab, openNew } = useAppActions();
+  const { session } = useAuth();
 
   return (
     <div style={{ display: 'flex', justifyContent: 'center', padding: '36px 16px 60px' }}>
@@ -61,7 +63,7 @@ export default function MobileView() {
               fontWeight: 700,
             }}
           >
-            FR
+            {session ? initials(session.email) : '—'}
           </span>
         </div>
 
@@ -86,29 +88,22 @@ export default function MobileView() {
 }
 
 function MobileHome() {
-  const { prospects, tasks } = useAppState();
-  const { approve, toggleTask } = useAppActions();
-  const active = prospects.filter((p) => p.stage !== 'Gagné' && p.stage !== 'Perdu');
-  const activeTotal = active.reduce((a, b) => a + b.value, 0);
-  const newCount = prospects.filter((p) => p.stage === 'Nouveau').length;
+  const { prospects, stages, tasks } = useAppState();
+  const { toggleTask } = useAppActions();
+  const active = prospects.filter((p) => {
+    const stage = stages.find((s) => s.id === p.stageId);
+    return stage && !stage.isWon && !stage.isLost;
+  });
+  const activeTotal = active.reduce((a, b) => a + b.valueCents, 0);
+  const newStage = [...stages].sort((a, b) => a.position - b.position)[0];
+  const newCount = newStage ? prospects.filter((p) => p.stageId === newStage.id).length : 0;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       <div>
-        <div style={{ fontSize: 11, color: '#7A8899', fontWeight: 600 }}>Mercredi 24 septembre</div>
-        <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-.03em' }}>Bonjour Francis,</div>
+        <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-.03em' }}>Bonjour,</div>
       </div>
-      <div style={{ borderRadius: 14, background: '#0F1B2D', color: '#F5F2EC', padding: 16 }}>
-        <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '.1em', color: 'var(--sg-accent)' }}>PROCHAINE ACTION</div>
-        <div style={{ margin: '6px 0 4px', fontSize: 16, fontWeight: 800, lineHeight: 1.25 }}>Approuver la page « À propos »</div>
-        <div style={{ fontSize: 12, color: '#B9C4CF', marginBottom: 12 }}>Version privée prête depuis 2 jours.</div>
-        <button
-          onClick={approve}
-          style={{ width: '100%', minHeight: 44, borderRadius: 10, border: 'none', background: 'var(--sg-accent)', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}
-        >
-          Approuver la version
-        </button>
-      </div>
+      <ProjectStatusCard compact />
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
         <div style={{ borderRadius: 12, background: '#fff', border: '1px solid var(--sg-border)', padding: 12 }}>
           <div style={{ fontSize: 22, fontWeight: 800 }}>{newCount}</div>
@@ -148,7 +143,7 @@ function MobileHome() {
                 <div style={{ fontSize: 13, fontWeight: 600, textDecoration: t.done ? 'line-through' : 'none', color: t.done ? '#9AA6B2' : undefined }}>
                   {t.label}
                 </div>
-                <div style={{ fontSize: 11, color: '#7A8899' }}>{t.due}</div>
+                <div style={{ fontSize: 11, color: '#7A8899' }}>{t.dueDate ?? '—'}</div>
               </div>
             </div>
           ))}
@@ -159,19 +154,21 @@ function MobileHome() {
 }
 
 function MobilePipeline() {
-  const { prospects, mStage } = useAppState();
+  const { prospects, stages, mStage } = useAppState();
   const { setMStage } = useAppActions();
-  const items = prospects.filter((p) => p.stage === mStage);
-  const total = items.reduce((a, b) => a + b.value, 0);
+  const ordered = [...stages].sort((a, b) => a.position - b.position);
+  const activeStageId = mStage || ordered[0]?.id;
+  const items = prospects.filter((p) => p.stageId === activeStageId);
+  const total = items.reduce((a, b) => a + b.valueCents, 0);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       <div style={{ fontSize: 20, fontWeight: 800, letterSpacing: '-.03em' }}>Pipeline</div>
       <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
-        {STAGES.map((st) => (
+        {ordered.map((st) => (
           <button
-            key={st.key}
-            onClick={() => setMStage(st.key)}
+            key={st.id}
+            onClick={() => setMStage(st.id)}
             style={{
               flex: 'none',
               minHeight: 36,
@@ -181,12 +178,12 @@ function MobilePipeline() {
               fontWeight: 700,
               cursor: 'pointer',
               whiteSpace: 'nowrap',
-              border: '1px solid ' + (mStage === st.key ? '#0F1B2D' : 'var(--sg-border-strong)'),
-              background: mStage === st.key ? '#0F1B2D' : '#fff',
-              color: mStage === st.key ? '#fff' : '#5D6B7B',
+              border: '1px solid ' + (activeStageId === st.id ? '#0F1B2D' : 'var(--sg-border-strong)'),
+              background: activeStageId === st.id ? '#0F1B2D' : '#fff',
+              color: activeStageId === st.id ? '#fff' : '#5D6B7B',
             }}
           >
-            {st.key}
+            {st.label}
           </button>
         ))}
       </div>
@@ -198,7 +195,7 @@ function MobilePipeline() {
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         {items.map((p, i) => (
-          <ProspectCard key={p.id} p={p} idx={p.id + i} mobile />
+          <ProspectCard key={p.id} p={p} idx={i} mobile />
         ))}
         {items.length === 0 && (
           <div style={{ border: '1px dashed var(--sg-border-strong)', borderRadius: 12, padding: '26px 12px', textAlign: 'center', fontSize: 12.5, color: '#9AA6B2' }}>

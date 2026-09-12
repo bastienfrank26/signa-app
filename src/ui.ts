@@ -1,7 +1,6 @@
 import type { CSSProperties } from 'react';
-import { stageColor } from './AppContext';
-import type { Stage } from './types';
-import { AVATAR_COLORS } from './data/seed';
+
+const AVATAR_COLORS = ['#0F1B2D', '#E8521A', '#2B6CB0', '#1F7A5C', '#6B46C1', '#B4740E'];
 
 export function navStyle(active: boolean): CSSProperties {
   return {
@@ -62,8 +61,8 @@ export function chip(active: boolean, color?: string): CSSProperties {
   };
 }
 
-export function tag(stage: Stage): CSSProperties {
-  const c = stageColor(stage);
+export function tag(color: string): CSSProperties {
+  const c = color;
   return {
     display: 'inline-block',
     padding: '4px 10px',
