@@ -30,13 +30,18 @@ Implémenté dans `src/styles/global.css` (variables CSS) et `src/ui.ts` (helper
 
 ## Mise en page
 
-Sur bureau, barre latérale stable. Sur mobile, navigation compacte et actions secondaires dans des menus ou feuilles. Les écrans critiques fonctionnent à partir de 320 px.
+Seuil unique bureau/mobile : **768 px** (`.sg-desktop-only` / `.sg-mobile-only` dans `src/styles/global.css`, piloté par vraie media query CSS, pas par un état JS).
 
-> Note (2026-09-12) : le prototype CRM simule le mobile via un cadre de téléphone dans la même page (toggle Bureau/Mobile), pas encore via de vraies media queries responsives. Fonctionnel pour la démonstration, à revoir pour une vraie expérience mobile native du navigateur.
+- Bureau (≥768 px) : barre latérale stable (`Sidebar`).
+- Mobile (<768 px) : barre d'onglets fixe en bas d'écran (`MobileNav`, hauteur `--sg-mobile-nav-height`, respecte `env(safe-area-inset-bottom)`) avec les sections les plus utilisées (Accueil, Prospects, Pipeline) + un onglet « Plus » qui ouvre une feuille (`MobileMoreSheet`) pour les sections secondaires, le compte et la déconnexion.
+- La liste des sections de navigation vit une seule fois dans `src/navigation.ts` — `Sidebar`, `MobileNav` et `MobileMoreSheet` la lisent tous, aucune duplication d'écrans.
+- Les écrans critiques fonctionnent à partir de 320 px.
+
+> Note (2026-09-12, remplacée le même jour) : le prototype CRM simulait le mobile via un cadre de téléphone dans la même page (toggle Bureau/Mobile). Remplacé par une vraie navigation responsive (voir ci-dessus) ; `MobileView.tsx` et l'état `device`/`mTab`/`mStage` ont été retirés.
 
 ## Composants obligatoires
 
-- boutons primaire, secondaire, discret et dangereux — construits (styles inline cohérents, pas de composant `<Button>` unique factorisé);
+- boutons primaire, secondaire, discret et dangereux — composant `Button` factorisé (`src/components/ui/Button.tsx`), min. 44 px de hauteur par défaut; les écrans plus anciens gardent encore des styles inline équivalents, à migrer au fil de l'eau;
 - champs avec étiquette, aide et erreur — construits (`formStyles.ts`);
 - tableau avec version mobile — construit (Prospects);
 - badges d'état avec libellé — construits;

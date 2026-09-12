@@ -86,6 +86,19 @@
 - [x] Vérifié en navigateur réel (Playwright, production) : paiement Stripe complet avec vraie carte de test jusqu'au webhook et à la mise à jour de `subscriptions` ; MFA activé de bout en bout avec un vrai code TOTP généré ; garde-fous de rôle (client normal bloqué sur `create-checkout-session`)
 - [x] Vérifié la disponibilité des sauvegardes Supabase via l'API de gestion : **aucune sauvegarde ni PITR activés sur le palier actuel** (`pitr_enabled: false`, `backups: []`) — test de restauration impossible tant que ce n'est pas activé (palier payant requis, DEC-018)
 
+## Terminées (branche `design/mobile-nav`, hors phases) — 2026-09-12
+
+- [x] Navigation mobile réelle du shell client/CRM (`Sidebar`/`Header`/`App.tsx`) — remplace le faux toggle Bureau/Mobile (cadre de téléphone dans la page). Barre d'onglets fixe (`MobileNav`) + feuille secondaire (`MobileMoreSheet`), seuil CSS 768 px (`.sg-desktop-only`/`.sg-mobile-only`), zone sûre iOS (`env(safe-area-inset-bottom)`)
+- [x] Source unique de navigation `src/navigation.ts` (Sidebar + MobileNav + MobileMoreSheet lisent la même liste)
+- [x] Composant `Button` factorisé (`src/components/ui/Button.tsx`) — comblait un vide documenté dans `docs/11-DESIGN-SYSTEM.md`
+- [x] Nettoyage : `MobileView.tsx` supprimé, état `device`/`mTab`/`mStage` retiré de `AppContext.tsx`/`types.ts`, helpers `pillDark`/`mTabStyle` morts retirés de `ui.ts`
+- [x] Vérifié : `tsc --noEmit` et `npm run build` passent; page `/connexion` capturée en 390 px et 1280 px sans erreur console
+
+## À faire — suite de la navigation mobile
+
+- [ ] Non couvert par cette passe (hors scope "navigation") : `ProspectsScreen` reste un tableau à défilement horizontal sous 768 px (pas de vraies cartes mobiles) ; `AdminLayout` (console interne Signa) n'est pas responsive — jugé acceptable car outil interne desktop
+- [ ] Pas de test visuel authentifié réel de `MobileNav`/`MobileMoreSheet` dans cette session — aucun compte de test disponible et création d'un compte jetable via l'inscription publique non faite sans mandat (un seul projet Supabase partagé, pas de séparation dev/prod). À vérifier manuellement par Francis ou avec un compte de test explicite
+
 ## Terminées (Phase 6, partiel) — 2026-09-12
 
 - [x] RPC `admin_pilot_metrics` + page `/admin/indicateurs` : organisations (total/actives/suspendues), projets par statut, soumissions de site (30j), organisations actives (7j), suivis en retard, abonnements par statut, sites actifs, actions admin (7j) — indicateurs du doc 13-ROADMAP
