@@ -14,6 +14,47 @@
   --sg-text-muted: #7a8899;
   --sg-text-soft: #6b7888;
   --sg-danger: #c0392b;
+
+  /* Navigation mobile : hauteur de la barre d'onglets + zone sûre (encoche/geste iOS) */
+  --sg-mobile-nav-height: 58px;
+  --sg-safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Seuil unique bureau/mobile pour tout le shell applicatif (Sidebar, Header, MobileNav).
+   En dessous : navigation par barre d'onglets. Au-dessus : barre latérale. */
+.sg-desktop-only {
+  display: none;
+}
+.sg-mobile-only {
+  display: block;
+}
+@media (min-width: 768px) {
+  .sg-desktop-only {
+    display: flex;
+  }
+  .sg-mobile-only {
+    display: none !important;
+  }
+}
+
+.sg-main-content {
+  padding: 26px 28px 40px;
+}
+@media (max-width: 767px) {
+  .sg-main-content {
+    padding: 16px 16px calc(var(--sg-mobile-nav-height) + var(--sg-safe-bottom) + 20px);
+  }
+}
+
+/* Éléments d'en-tête réservés au bureau : recherche et liens texte (repris dans la feuille « Plus » mobile). */
+@media (max-width: 767px) {
+  .sg-header-desktop-only {
+    display: none !important;
+  }
+  .sg-header {
+    padding: 12px 16px !important;
+    gap: 10px !important;
+  }
 }
 
 * {

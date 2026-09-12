@@ -35,19 +35,6 @@ export function pill(active: boolean): CSSProperties {
   };
 }
 
-export function pillDark(active: boolean): CSSProperties {
-  return {
-    padding: '7px 13px',
-    borderRadius: 8,
-    border: 'none',
-    cursor: 'pointer',
-    fontSize: 12.5,
-    fontWeight: 700,
-    background: active ? 'var(--sg-accent)' : 'transparent',
-    color: active ? '#fff' : '#8899AA',
-  };
-}
-
 export function chip(active: boolean, color?: string): CSSProperties {
   return {
     padding: '8px 13px',
@@ -88,20 +75,6 @@ export function avatarStyle(idx: number, size = 34): CSSProperties {
     color: '#fff',
     fontSize: size < 30 ? 10 : 12,
     fontWeight: 700,
-  };
-}
-
-export function mTabStyle(active: boolean): CSSProperties {
-  return {
-    flex: 1,
-    minHeight: 56,
-    border: 'none',
-    background: 'none',
-    fontSize: 12,
-    fontWeight: 700,
-    cursor: 'pointer',
-    color: active ? '#0F1B2D' : '#9AA6B2',
-    borderTop: '2px solid ' + (active ? 'var(--sg-accent)' : 'transparent'),
   };
 }
 

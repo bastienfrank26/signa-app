@@ -24,6 +24,10 @@
 - DEC-014 (premier module après CRM, Rendez-vous vs Appels de service) : à trancher selon les clients pilotes, en Phase 6.
 - Transfert du repo GitHub vers `bastienfrank26` : à faire quand l'accès sera possible.
 
+## Navigation mobile et design system (2026-09-12, branche `design/mobile-nav`)
+
+Décision : le shell client/CRM avait une navigation mobile factice (cadre de téléphone + toggle JS Bureau/Mobile dans `App.tsx`/`MobileView.tsx`), pas de vraie media query. Remplacé par une vraie navigation responsive (barre d'onglets bas d'écran + feuille « Plus », seuil CSS 768 px) et un premier composant `Button` factorisé, comme point de départ du design system réel (`docs/11-DESIGN-SYSTEM.md` mis à jour). Détail dans `tasks.md`. Reste explicitement hors scope de cette passe : `ProspectsScreen` (toujours défilement horizontal sous 768 px) et `AdminLayout` (console interne, non responsive, jugé acceptable).
+
 ## État du prototype (2026-09-12)
 
 Maquette visuelle complète du CRM livrée (Accueil variantes A/B, Prospects, Pipeline, tiroir prospect, modale nouveau prospect, vue mobile). 100 % état local (`AppContext.tsx`), aucune persistance, aucune authentification. Sert de base visuelle pour la Phase 3 (CRM réel) — pas de refonte visuelle prévue, seulement le branchement à Supabase.

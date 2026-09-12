@@ -9,12 +9,16 @@
 ## `src/`
 
 - `main.tsx` — point d'entrée, routing (react-router-dom), AuthProvider
-- `App.tsx` — `CrmPrototype` : shell CRM (toggle bureau/mobile, layout, drawer, modale, toast)
+- `App.tsx` — `CrmPrototype` : shell CRM (layout responsive réel, drawer, modale, toast)
 - `AppContext.tsx` — état global du prototype CRM (à démanteler en features dès Phase 3)
 - `RequireOrganization.tsx` — affiche `CreateOrganizationPage` si l'utilisateur connecté n'a aucune membership
 - `types.ts` — types du prototype (Prospect, Task, Stage, etc.)
 - `ui.ts` — styles/tokens partagés (nav, pill, chip, tag, avatar)
-- `styles/global.css` — reset, police Manrope, animations
+- `navigation.ts` — source unique des sections/écrans de navigation (Sidebar, MobileNav, MobileMoreSheet)
+- `styles/global.css` — reset, police Manrope, animations, seuil responsive 768 px (`.sg-desktop-only`/`.sg-mobile-only`)
+- `components/ui/Button.tsx` — bouton du design system (primaire/secondaire/discret/dangereux)
+- `components/MobileNav.tsx` — barre d'onglets mobile fixe (réelle, pilotée par media query CSS)
+- `components/MobileMoreSheet.tsx` — feuille mobile « Plus » (nav secondaire, compte, déconnexion)
 - `vite-env.d.ts` — types Vite (`import.meta.env`)
 - `data/seed.ts` — données de démonstration CRM (à déplacer en `infrastructure/fixtures/` par feature)
 - `infrastructure/supabase/client.ts` — client Supabase unique (`VITE_SUPABASE_URL`/`VITE_SUPABASE_PUBLISHABLE_KEY`)

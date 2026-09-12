@@ -4,7 +4,7 @@ import { supabase } from './infrastructure/supabase/client';
 import { createSupabaseCrmRepository } from './features/crm/infrastructure/supabase/SupabaseCrmRepository';
 import { stageColorByKey } from './features/crm/domain/stageColors';
 import type { ActivityItem, CrmBundle, Prospect, Stage, Task } from './features/crm/domain/crm';
-import type { Device, MobileTab, Screen, Variant } from './types';
+import type { Screen, Variant } from './types';
 
 const repository = createSupabaseCrmRepository(supabase);
 
@@ -28,7 +28,6 @@ export function stageColor(stageKey: string): string {
 interface AppState {
   screen: Screen;
   variant: Variant;
-  device: Device;
   loading: boolean;
   loadError: string | null;
   stages: Stage[];
@@ -45,14 +44,11 @@ interface AppState {
   fValue: string;
   formError: boolean;
   toast: string | null;
-  mTab: MobileTab;
-  mStage: string;
 }
 
 interface AppActions {
   setScreen: (s: Screen) => void;
   setVariant: (v: Variant) => void;
-  setDevice: (d: Device) => void;
   setQuery: (q: string) => void;
   setFilter: (f: string | 'Tous') => void;
   resetFilters: () => void;
@@ -71,8 +67,6 @@ interface AppActions {
   submitNew: () => void;
   approve: () => void;
   askRevision: () => void;
-  setMTab: (t: MobileTab) => void;
-  setMStage: (s: string) => void;
   showToast: (msg: string) => void;
 }
 
@@ -85,7 +79,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const [screen, setScreen] = useState<Screen>('accueil');
   const [variant, setVariant] = useState<Variant>('A');
-  const [device, setDevice] = useState<Device>('desktop');
   const [bundle, setBundle] = useState<CrmBundle>({ stages: [], prospects: [], activities: [], tasks: [] });
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -99,8 +92,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [fValue, setFValue] = useState('');
   const [formError, setFormError] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
-  const [mTab, setMTab] = useState<MobileTab>('home');
-  const [mStage, setMStage] = useState<string>('');
   const toastTimer = useRef<ReturnType<typeof setTimeout>>();
 
   const showToast = useCallback((msg: string) => {
@@ -114,7 +105,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     try {
       const next = await repository.getBundle(organizationId);
       setBundle(next);
-      setMStage((prev) => prev || next.stages[0]?.id || '');
     } catch (err) {
       setLoadError(err instanceof Error ? err.message : 'Le CRM n’a pas pu être chargé.');
     } finally {
@@ -217,17 +207,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   const state: AppState = {
-    screen, variant, device, loading, loadError,
+    screen, variant, loading, loadError,
     stages: bundle.stages, prospects: bundle.prospects, activity: bundle.activities, tasks: bundle.tasks,
     query, filter, selectedId, note, newOpen, fName, fSub, fValue,
-    formError, toast, mTab, mStage,
+    formError, toast,
   };
 
   const actions: AppActions = useMemo(
     () => ({
       setScreen,
       setVariant,
-      setDevice,
       setQuery,
       setFilter,
       resetFilters: () => {
@@ -252,8 +241,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       submitNew,
       approve: () => setScreen('projet'),
       askRevision: () => setScreen('projet'),
-      setMTab,
-      setMStage,
       showToast,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps

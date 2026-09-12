@@ -1,6 +1,7 @@
 import { initials, useAppActions, useAppState } from '../AppContext';
 import { useAuth } from '../features/auth/presentation/useAuth';
 import { navStyle } from '../ui';
+import { NAV_SECTIONS } from '../navigation';
 import type { Screen } from '../types';
 
 const roleLabels: Record<string, string> = {
@@ -46,13 +47,13 @@ export default function Sidebar() {
 
   return (
     <aside
+      className="sg-desktop-only"
       style={{
         width: 248,
         flex: 'none',
         background: 'var(--sg-side-bg)',
         color: 'var(--sg-side-fg)',
         padding: '22px 14px',
-        display: 'flex',
         flexDirection: 'column',
         gap: 26,
       }}
@@ -78,39 +79,29 @@ export default function Sidebar() {
       </div>
 
       <nav style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-          <div
-            style={{
-              padding: '0 8px 6px',
-              fontSize: 11,
-              fontWeight: 700,
-              letterSpacing: '.09em',
-              color: 'var(--sg-side-muted)',
-            }}
-          >
-            MON SITE
+        {NAV_SECTIONS.map((section) => (
+          <div key={section.label} style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <div
+              style={{
+                padding: '0 8px 6px',
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: '.09em',
+                color: 'var(--sg-side-muted)',
+              }}
+            >
+              {section.label}
+            </div>
+            {section.items.map((item) => (
+              <NavButton
+                key={item.screen}
+                label={item.label}
+                screen={item.screen}
+                badge={item.badgeKey === 'newProspects' ? newCount || undefined : item.badgeKey === 'tasksLeft' ? tasksLeft || undefined : undefined}
+              />
+            ))}
           </div>
-          <NavButton label="Accueil" screen="accueil" />
-          <NavButton label="Suivi du projet" screen="projet" />
-          <NavButton label="Fichiers" screen="fichiers" />
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-          <div
-            style={{
-              padding: '0 8px 6px',
-              fontSize: 11,
-              fontWeight: 700,
-              letterSpacing: '.09em',
-              color: 'var(--sg-side-muted)',
-            }}
-          >
-            CRM
-          </div>
-          <NavButton label="Prospects" screen="prospects" badge={newCount || undefined} />
-          <NavButton label="Pipeline" screen="pipeline" />
-          <NavButton label="Contacts" screen="contacts" />
-          <NavButton label="Tâches" screen="taches" badge={tasksLeft || undefined} />
-        </div>
+        ))}
       </nav>
 
       <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: 10 }}>

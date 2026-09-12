@@ -15,6 +15,7 @@ export default function Header() {
 
   return (
     <header
+      className="sg-header"
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -25,6 +26,7 @@ export default function Header() {
       }}
     >
       <div
+        className="sg-header-desktop-only"
         style={{
           flex: 1,
           maxWidth: 460,
@@ -64,11 +66,12 @@ export default function Header() {
             <div style={{ fontSize: 11, color: '#7A8899' }}>{membership ? roleLabels[membership.role] ?? membership.role : ''}</div>
           </div>
         </div>
-        <Link to="/parametres/securite" style={{ fontSize: 12.5, color: 'var(--sg-slate-400)' }}>
+        <Link to="/parametres/securite" className="sg-header-desktop-only" style={{ fontSize: 12.5, color: 'var(--sg-slate-400)' }}>
           Sécurité
         </Link>
         <button
           onClick={() => void signOut()}
+          className="sg-header-desktop-only"
           style={{ padding: 0, border: 'none', background: 'none', fontSize: 12.5, color: 'var(--sg-slate-400)', cursor: 'pointer' }}
         >
           Déconnexion
