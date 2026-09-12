@@ -27,13 +27,13 @@ export default function PipelineScreen() {
           + Ajouter un prospect
         </button>
       </div>
-      <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start', overflowX: 'auto', paddingBottom: 12 }}>
+      <div className="sg-pipeline-columns" style={{ display: 'flex', gap: 14, alignItems: 'flex-start', overflowX: 'auto', paddingBottom: 12 }}>
         {ordered.map((st) => {
           const items = prospects.filter((p) => p.stageId === st.id);
           const total = items.reduce((a, b) => a + b.valueCents, 0);
           const color = stageColor(st.key);
           return (
-            <div key={st.id} style={{ width: 252, flex: 'none', borderRadius: 14, background: '#fff', border: '1px solid var(--sg-border)', padding: 14 }}>
+            <div key={st.id} className="sg-pipeline-column" style={{ width: 252, flex: 'none', borderRadius: 14, background: '#fff', border: '1px solid var(--sg-border)', padding: 14 }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
                   <span style={{ width: 8, height: 8, borderRadius: '50%', display: 'inline-block', background: color }} />

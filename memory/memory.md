@@ -24,6 +24,10 @@
 - DEC-014 (premier module après CRM, Rendez-vous vs Appels de service) : à trancher selon les clients pilotes, en Phase 6.
 - Transfert du repo GitHub vers `bastienfrank26` : à faire quand l'accès sera possible.
 
+## Compte de test permanent (2026-09-12)
+
+`bastienfrancis1@gmail.com` / organisation « Audit navigation mobile — test » créés pour auditer le shell mobile authentifié avec Playwright, avec mandat explicite de Francis. **Permanent** : aucune fonction de suppression de compte/organisation n'existe dans ce repo (pas de clé service-role, pas de RPC delete — seulement `admin_set_organization_status` qui suspend). Réutiliser ce compte pour les futurs audits authentifiés plutôt que d'en créer un nouveau (inscription publique exige confirmation courriel, pas automatisable seul).
+
 ## Navigation mobile et design system (2026-09-12, branche `design/mobile-nav`)
 
 Décision : le shell client/CRM avait une navigation mobile factice (cadre de téléphone + toggle JS Bureau/Mobile dans `App.tsx`/`MobileView.tsx`), pas de vraie media query. Remplacé par une vraie navigation responsive (barre d'onglets bas d'écran + feuille « Plus », seuil CSS 768 px) et un premier composant `Button` factorisé, comme point de départ du design system réel (`docs/11-DESIGN-SYSTEM.md` mis à jour). Détail dans `tasks.md`. Reste explicitement hors scope de cette passe : `ProspectsScreen` (toujours défilement horizontal sous 768 px) et `AdminLayout` (console interne, non responsive, jugé acceptable).

@@ -52,8 +52,15 @@
     display: none !important;
   }
   .sg-header {
-    padding: 12px 16px !important;
-    gap: 10px !important;
+    display: none !important;
+  }
+  /* Pipeline : colonnes empilées plutôt que défilement horizontal, pour ne pas déborder à droite. */
+  .sg-pipeline-columns {
+    flex-direction: column !important;
+    overflow-x: visible !important;
+  }
+  .sg-pipeline-column {
+    width: 100% !important;
   }
 }
 
