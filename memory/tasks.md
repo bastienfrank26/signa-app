@@ -21,8 +21,10 @@
 - [x] Bug RLS trouvé et corrigé : `insert().select()` sur `organizations` échouait (policy SELECT dépendait de la membership insérée par trigger, non visible au moment du RETURNING) — fix : colonne `created_by` + policy SELECT alternative
 - [x] Redéployé sur pm2/nginx (build + `pm2 restart signa-app`)
 
-## À faire (Phase 0 — reste)
+- [x] DNS `app.signaweb.ca` corrigé et stable — 2026-09-12
+- [x] Parcours complet testé en vrai navigateur (Playwright/Chromium contre `app.signaweb.ca` en production) : redirection non-authentifié, mauvais mot de passe (message d'erreur affiché), bon login, création d'organisation, bascule vers le CRM, navigation Prospects/Pipeline, session qui persiste après reload — tout conforme — 2026-09-12
 
-- [ ] DNS `app.signaweb.ca` a reviré vers la mauvaise IP après le déploiement — à corriger côté DNS (voir `memory.md`)
-- [ ] Tester le parcours complet dans un vrai navigateur une fois le DNS stable (signup, confirmation courriel réelle, login, création d'organisation)
+## À faire (avant Phase 1)
+
 - [ ] Décider si l'inscription libre (`/inscription`) reste ouverte au public ou si elle doit être retirée avant le pilote (le MVP prévoit que Signa crée les comptes après paiement, pas un self-signup)
+- [ ] Configurer un vrai fournisseur SMTP (Resend, comme `reca-app-v3`) dans Supabase Auth — le SMTP par défaut limite l'envoi de courriels de confirmation/réinitialisation à quelques par heure
