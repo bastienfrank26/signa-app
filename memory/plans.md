@@ -4,7 +4,7 @@ Plan de développement complet : voir `/root/.claude/plans/mellow-toasting-dahl.
 
 ## Phases (ordre confirmé)
 
-- [ ] Phase 0 — Fondation technique : Supabase, `organizations`/`memberships`/`invitations`, `features/auth`, react-router-dom, autorisation serveur
+- [x] Phase 0 — Fondation technique : Supabase, `organizations`/`memberships`/`invitations`, `features/auth`, react-router-dom, autorisation serveur (terminée 2026-09-12, détail dans `tasks.md`)
 - [ ] Phase 1 — Portail client : projets web, étapes, fichiers, corrections, approbations, notifications
 - [ ] Phase 2 — Administration Signa : organisations, accès, modules, sites, abonnements, audit
 - [ ] Phase 3 — CRM réel : brancher le prototype visuel existant (`HomeScreen`, `ProspectsScreen`, `PipelineScreen`) à Supabase
@@ -15,4 +15,4 @@ Plan de développement complet : voir `/root/.claude/plans/mellow-toasting-dahl.
 
 ## Prochaine étape immédiate
 
-Phase 0 — pas encore commencée. En attente du go de Francis.
+Phase 1 — Portail client. Avant de commencer : corriger le DNS `app.signaweb.ca` (a reviré vers la mauvaise IP), tester le parcours complet en navigateur, trancher si `/inscription` reste publique.

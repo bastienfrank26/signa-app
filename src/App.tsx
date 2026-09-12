@@ -95,7 +95,7 @@ function Shell() {
   );
 }
 
-export default function App() {
+export default function CrmPrototype() {
   return (
     <AppProvider>
       <Shell />

@@ -11,7 +11,7 @@
 
 - pm2 process `signa-app` (port 3100), sauvegardé (`pm2 save`).
 - nginx : `/etc/nginx/sites-available/signa-app`, HTTPS actif, redirect HTTP→HTTPS.
-- Domaine `app.signaweb.ca` : A record 185.172.64.13 (corrigé par Francis le 2026-09-12, pointait avant vers 74.208.236.245 par erreur).
+- Domaine `app.signaweb.ca` : A record doit être 185.172.64.13. Corrigé une première fois le 2026-09-12, mais a reviré vers 74.208.236.245 (mauvaise IP) le même jour, après le déploiement Phase 0. Revérifier après toute correction DNS avant de conclure que c'est stable (`getent ahosts app.signaweb.ca` depuis le serveur).
 
 ## GitHub
 

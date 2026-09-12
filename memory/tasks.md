@@ -10,10 +10,19 @@
 - [x] Système de mémoire (`memory/memory.md`, `tasks.md`, `plans.md`, `file-index.md`) — 2026-09-12
 - [x] Repo GitHub `groupe-reca/signa-app` créé et lié (temporaire, en attendant transfert vers `bastienfrank26`) — 2026-09-12
 
-## À faire (Phase 0)
+## Terminées (Phase 0) — 2026-09-12
 
-- [ ] Créer le projet Supabase, lier via CLI
-- [ ] Migrations `organizations`, `memberships`, `invitations`
-- [ ] `features/auth` (SupabaseAuthGateway, AuthProvider, LoginPage, guards)
-- [ ] Ajouter react-router-dom, retirer la navigation par état de `AppContext`
-- [ ] Vérifier l'isolation RLS avec 2 comptes de test
+- [x] Projet Supabase créé et lié via CLI (`mnadbkbdbjmugvsadeen`, région `ca-central-1`)
+- [x] Migrations `organizations`, `memberships`, `invitations` + fonctions `is_org_member`/`is_org_admin`/`current_app_session` (security definer)
+- [x] `features/auth` (SupabaseAuthGateway, AuthProvider, LoginPage, SignUpPage, ForgotPasswordPage, guards)
+- [x] `features/organizations` (CreateOrganizationPage, onboarding minimal pour Phase 0)
+- [x] react-router-dom ajouté : `/connexion`, `/inscription`, `/mot-de-passe-oublie` publiques ; `/*` protégé (RequireAuth → RequireOrganization → prototype CRM)
+- [x] Isolation RLS vérifiée avec 2 comptes de test réels (via API admin Supabase, nettoyés après test) : un compte ne voit ni les organisations ni les memberships d'un autre, ne peut pas s'auto-insérer dans une organisation étrangère
+- [x] Bug RLS trouvé et corrigé : `insert().select()` sur `organizations` échouait (policy SELECT dépendait de la membership insérée par trigger, non visible au moment du RETURNING) — fix : colonne `created_by` + policy SELECT alternative
+- [x] Redéployé sur pm2/nginx (build + `pm2 restart signa-app`)
+
+## À faire (Phase 0 — reste)
+
+- [ ] DNS `app.signaweb.ca` a reviré vers la mauvaise IP après le déploiement — à corriger côté DNS (voir `memory.md`)
+- [ ] Tester le parcours complet dans un vrai navigateur une fois le DNS stable (signup, confirmation courriel réelle, login, création d'organisation)
+- [ ] Décider si l'inscription libre (`/inscription`) reste ouverte au public ou si elle doit être retirée avant le pilote (le MVP prévoit que Signa crée les comptes après paiement, pas un self-signup)
