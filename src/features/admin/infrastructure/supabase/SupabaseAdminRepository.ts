@@ -114,6 +114,15 @@ export function createSupabaseAdminRepository(client: SupabaseClient): AdminRepo
       return summaries;
     },
 
+    async createOrganizationWithInvitation(name, email) {
+      const { data, error } = await client
+        .rpc('admin_create_organization_with_invitation', { p_name: name, p_email: email })
+        .single();
+      if (error || !data) throw new Error(error?.message ?? 'La création a échoué.');
+      const row = data as Record<string, unknown>;
+      return { organizationId: row.organization_id as string, invitationToken: row.invitation_token as string };
+    },
+
     async getOrganizationDetail(organizationId) {
       const [orgRes, membershipsRes, projectRes] = await Promise.all([
         client.from('organizations').select('*').eq('id', organizationId).maybeSingle(),

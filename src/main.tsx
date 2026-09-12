@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import CrmPrototype from './App';
 import RequireOrganization from './RequireOrganization';
+import AcceptInvitationPage from './features/organizations/presentation/AcceptInvitationPage';
 import { AuthProvider } from './features/auth/presentation/AuthProvider';
 import { RequireAuth, RequireNoAuth } from './features/auth/presentation/guards';
 import LoginPage from './features/auth/presentation/LoginPage';
@@ -30,6 +31,7 @@ createRoot(document.getElementById('root')!).render(
           </Route>
           <Route element={<RequireAuth />}>
             <Route path="/parametres/securite" element={<SecurityPage />} />
+            <Route path="/accepter-invitation" element={<AcceptInvitationPage />} />
             <Route element={<RequireStaff />}>
               <Route path="/admin/organisations" element={<OrganizationsListPage />} />
               <Route path="/admin/organisations/:organizationId" element={<OrganizationDetailPage />} />

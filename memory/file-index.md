@@ -45,6 +45,7 @@
 - `domain/organization.ts`, `application/OrganizationRepository.ts`
 - `infrastructure/supabase/SupabaseOrganizationRepository.ts`
 - `presentation/CreateOrganizationPage.tsx` — onboarding temporaire (self-service), à revoir en Phase 2 (création par Signa après paiement)
+- `presentation/AcceptInvitationPage.tsx` — route `/accepter-invitation?token=...` (2026-09-12), rachète une invitation créée par l'admin (`accept_invitation`)
 
 ## `src/features/portal/` (Phase 1)
 
@@ -61,7 +62,7 @@
 - `infrastructure/supabase/SupabaseAdminRepository.ts` — liste/détail organisations, RPC admin (statuts, étapes, memberships), audit
 - `presentation/useStaffRole.ts` — hook + instance partagée du repository (`adminRepository`)
 - `presentation/RequireStaff.tsx` — garde de route (affiche "Accès refusé" si non-personnel)
-- `presentation/AdminLayout.tsx`, `OrganizationsListPage.tsx`, `OrganizationDetailPage.tsx`, `AuditLogPage.tsx`, `ReasonDialog.tsx` (motif obligatoire réutilisable), `SitesSection.tsx` (Phase 4 : création/rotation/statut de site, secret affiché une fois), `BillingSection.tsx` (Phase 5 : statut d'abonnement, lien de paiement), `PilotMetricsPage.tsx` (Phase 6 : indicateurs du pilote)
+- `presentation/AdminLayout.tsx`, `OrganizationsListPage.tsx`, `OrganizationDetailPage.tsx`, `AuditLogPage.tsx`, `ReasonDialog.tsx` (motif obligatoire réutilisable), `SitesSection.tsx` (Phase 4 : création/rotation/statut de site, secret affiché une fois), `BillingSection.tsx` (Phase 5 : statut d'abonnement, lien de paiement), `PilotMetricsPage.tsx` (Phase 6 : indicateurs du pilote), `CreateClientModal.tsx` (2026-09-12 : crée organisation + invitation, affiche le lien à envoyer manuellement)
 
 ## `src/features/crm/` (Phase 3)
 

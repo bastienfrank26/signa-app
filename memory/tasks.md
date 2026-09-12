@@ -111,6 +111,17 @@
 - [x] Vérifié avec Playwright (compte de test) : upload + téléchargement réel (URL signée Supabase Storage) — zéro erreur console
 - [x] `StubScreen.tsx` simplifié en filet de sécurité générique — tous les écrans de `Screen` sont maintenant construits (Contacts, Tâches, Fichiers)
 
+## Terminées (admin : création de client + invitation) — 2026-09-12
+
+- [x] Flux MVP réel construit : Signa crée l'organisation du client + une invitation (`admin_create_organization_with_invitation`), au lieu du seul self-signup. Table `invitations` existait depuis Phase 0, jamais utilisée avant aujourd'hui
+- [x] Migration `20260912200000_admin_organization_invitations.sql` : contrainte `invitations.role` élargie à `owner` ; `handle_new_organization()` corrigé pour que le personnel Signa ne devienne jamais membre du client qu'il crée pour lui ; RPC `admin_create_organization_with_invitation` et `accept_invitation` ; policies `invitations_insert_staff_admin`/`invitations_select_staff`
+- [x] `CreateClientModal.tsx` (admin, bouton « + Créer un client » dans `OrganizationsListPage.tsx`) — affiche le lien d'invitation à copier/envoyer manuellement (**aucun envoi automatique**, pas de fournisseur SMTP configuré)
+- [x] `AcceptInvitationPage.tsx` (route `/accepter-invitation?token=...`, sous `RequireAuth` mais hors `RequireOrganization`) — le client authentifié rachète son invitation
+- [x] **Accès base de données obtenu cette session** : `SUPABASE_ACCESS_TOKEN` fourni par Francis (via fichier `/tmp`, jamais collé dans le chat), migration appliquée avec `supabase db push --linked`, vérifiée avec `supabase db query --linked`. Contrairement à avant (voir note plus haut sur l'absence d'accès), un agent peut maintenant appliquer des migrations et interroger la base directement dans cette session — mais le jeton n'est pas persistant (fichier supprimé après usage), à refournir à la prochaine session si besoin
+- [x] Vérifié de bout en bout avec Playwright + accès DB direct : staff crée le client (compte `bastienfrancis1@gmail.com` promu `internal_staff` temporairement, **avec autorisation explicite de Francis**, retiré après le test) → lien généré → invitation acceptée → membership `owner` créé → staff jamais devenu membre → zéro erreur console
+- [ ] Invitation par courriel automatique (Accès, membre supplémentaire dans une org déjà active) — distincte de la primo-invitation ci-dessus, toujours pas construite
+- [ ] Section Modules (aucune table, un seul module CRM câblé en dur) et section Soutien (rien construit) — toujours en attente, voir question posée à Francis
+
 ## Reste du module CRM (fichiers attachés à un contact)
 
 - [ ] Fichiers attachés à une fiche contact (doc 06, différent de l'écran Fichiers ci-dessus) — **aucune table** pour ça. Nécessite migration (table + policies RLS + bucket Storage), patron déjà établi par `project_files`/`project-files`

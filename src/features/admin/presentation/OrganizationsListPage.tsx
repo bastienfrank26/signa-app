@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import AdminLayout from './AdminLayout';
 import { adminRepository } from './useStaffRole';
+import CreateClientModal from './CreateClientModal';
 import type { OrganizationSummary } from '../domain/admin';
 import { projectStatusLabels } from '../../portal/domain/project';
 
@@ -10,8 +11,9 @@ export default function OrganizationsListPage() {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [createOpen, setCreateOpen] = useState(false);
 
-  useEffect(() => {
+  const reload = useCallback(() => {
     void adminRepository
       .listOrganizations()
       .then(setOrgs)
@@ -19,12 +21,26 @@ export default function OrganizationsListPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  useEffect(() => {
+    reload();
+  }, [reload]);
+
   const filtered = orgs.filter((o) => o.name.toLowerCase().includes(query.trim().toLowerCase()));
 
   return (
     <AdminLayout>
-      <h1 style={{ margin: '0 0 4px', fontSize: 26, fontWeight: 800, letterSpacing: '-.02em' }}>Organisations</h1>
-      <p style={{ margin: '0 0 18px', fontSize: 13.5, color: 'var(--sg-text-muted)' }}>{orgs.length} organisation(s)</p>
+      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
+        <div>
+          <h1 style={{ margin: '0 0 4px', fontSize: 26, fontWeight: 800, letterSpacing: '-.02em' }}>Organisations</h1>
+          <p style={{ margin: '0 0 18px', fontSize: 13.5, color: 'var(--sg-text-muted)' }}>{orgs.length} organisation(s)</p>
+        </div>
+        <button
+          onClick={() => setCreateOpen(true)}
+          style={{ padding: '10px 18px', borderRadius: 10, border: 'none', background: 'var(--sg-accent)', color: '#fff', fontSize: 13.5, fontWeight: 700, cursor: 'pointer' }}
+        >
+          + Créer un client
+        </button>
+      </div>
 
       <input
         value={query}
@@ -63,6 +79,8 @@ export default function OrganizationsListPage() {
           {filtered.length === 0 && <div style={{ padding: 20, textAlign: 'center', color: 'var(--sg-text-muted)' }}>Aucune organisation trouvée.</div>}
         </div>
       )}
+
+      {createOpen && <CreateClientModal onClose={() => setCreateOpen(false)} onCreated={reload} />}
     </AdminLayout>
   );
 }

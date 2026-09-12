@@ -11,6 +11,7 @@ export interface AdminRepository {
   testSiteIntegration: (siteId: string) => Promise<{ submissionId: string }>;
   getStaffRole: () => Promise<string | null>;
   listOrganizations: () => Promise<OrganizationSummary[]>;
+  createOrganizationWithInvitation: (name: string, email: string) => Promise<{ organizationId: string; invitationToken: string }>;
   getOrganizationDetail: (organizationId: string) => Promise<OrganizationDetail | null>;
   setOrganizationStatus: (organizationId: string, status: 'active' | 'suspended', reason: string) => Promise<void>;
   setProjectStatus: (projectId: string, status: string, reason: string) => Promise<void>;
