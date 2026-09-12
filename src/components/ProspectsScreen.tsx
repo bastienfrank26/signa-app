@@ -1,9 +1,14 @@
 import { money, initials, stageColor, useAppActions, useAppState } from '../AppContext';
+import { formatNextFollowUp } from '../features/crm/domain/format';
 import { avatarStyle, chip, tag } from '../ui';
+
+function csvCell(value: string): string {
+  return `"${value.replace(/"/g, '""')}"`;
+}
 
 export default function ProspectsScreen() {
   const { prospects, stages, query, filter } = useAppState();
-  const { setQuery, setFilter, resetFilters, openProspect, openNew, exportCsv } = useAppActions();
+  const { setQuery, setFilter, resetFilters, openProspect, openNew } = useAppActions();
   const ordered = [...stages].sort((a, b) => a.position - b.position);
 
   const rows = prospects.filter((p) => {
@@ -12,6 +17,36 @@ export default function ProspectsScreen() {
     const okF = filter === 'Tous' || p.stageId === filter;
     return okQ && okF;
   });
+
+  function exportCsv() {
+    const header = ['Nom', 'Entreprise', 'Besoin', 'Étape', 'Valeur', 'Source', 'Courriel', 'Téléphone', 'Prochain suivi'];
+    const lines = rows.map((r) => {
+      const stage = stages.find((s) => s.id === r.stageId);
+      return [
+        r.name,
+        r.company,
+        r.need,
+        stage?.label ?? '',
+        money(r.valueCents),
+        r.source,
+        r.email,
+        r.phone,
+        formatNextFollowUp(r.nextFollowUpAt),
+      ]
+        .map(csvCell)
+        .join(',');
+    });
+    const csv = [header.map(csvCell).join(','), ...lines].join('\r\n');
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `prospects-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
 
   return (
     <div style={{ maxWidth: 1240, margin: '0 auto' }}>

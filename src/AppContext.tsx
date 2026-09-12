@@ -71,7 +71,6 @@ interface AppActions {
   submitNew: () => void;
   approve: () => void;
   askRevision: () => void;
-  exportCsv: () => void;
   setMTab: (t: MobileTab) => void;
   setMStage: (s: string) => void;
   showToast: (msg: string) => void;
@@ -253,7 +252,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       submitNew,
       approve: () => setScreen('projet'),
       askRevision: () => setScreen('projet'),
-      exportCsv: () => showToast('Export CSV généré'),
       setMTab,
       setMStage,
       showToast,

@@ -24,7 +24,7 @@
 - `domain/auth.ts` — `AppSession`, `Membership`, `MembershipRole`, `AuthFailure`
 - `application/AuthGateway.ts` — interface (port)
 - `infrastructure/supabase/SupabaseAuthGateway.ts` — implémentation Supabase (signUp/signIn/signOut/reset/current_app_session)
-- `presentation/` — `AuthProvider.tsx`, `AuthContext.ts`, `useAuth.ts`, `guards.tsx` (RequireAuth/RequireNoAuth), `AuthLayout.tsx`, `LoginPage.tsx`, `SignUpPage.tsx`, `ForgotPasswordPage.tsx`, `formStyles.ts`, `SecurityPage.tsx` (Phase 5 : enrôlement MFA TOTP, `/parametres/securite`)
+- `presentation/` — `AuthProvider.tsx`, `AuthContext.ts`, `useAuth.ts`, `guards.tsx` (RequireAuth/RequireNoAuth), `AuthLayout.tsx`, `LoginPage.tsx`, `SignUpPage.tsx`, `ForgotPasswordPage.tsx`, `ResetPasswordPage.tsx` (Phase 6 : manquait complètement, route `/reinitialiser-mot-de-passe`), `formStyles.ts`, `SecurityPage.tsx` (Phase 5 : enrôlement MFA TOTP, `/parametres/securite`)
 
 ## `src/features/organizations/` (Phase 0, minimal)
 
@@ -47,7 +47,7 @@
 - `infrastructure/supabase/SupabaseAdminRepository.ts` — liste/détail organisations, RPC admin (statuts, étapes, memberships), audit
 - `presentation/useStaffRole.ts` — hook + instance partagée du repository (`adminRepository`)
 - `presentation/RequireStaff.tsx` — garde de route (affiche "Accès refusé" si non-personnel)
-- `presentation/AdminLayout.tsx`, `OrganizationsListPage.tsx`, `OrganizationDetailPage.tsx`, `AuditLogPage.tsx`, `ReasonDialog.tsx` (motif obligatoire réutilisable), `SitesSection.tsx` (Phase 4 : création/rotation/statut de site, secret affiché une fois), `BillingSection.tsx` (Phase 5 : statut d'abonnement, lien de paiement)
+- `presentation/AdminLayout.tsx`, `OrganizationsListPage.tsx`, `OrganizationDetailPage.tsx`, `AuditLogPage.tsx`, `ReasonDialog.tsx` (motif obligatoire réutilisable), `SitesSection.tsx` (Phase 4 : création/rotation/statut de site, secret affiché une fois), `BillingSection.tsx` (Phase 5 : statut d'abonnement, lien de paiement), `PilotMetricsPage.tsx` (Phase 6 : indicateurs du pilote)
 
 ## `src/features/crm/` (Phase 3)
 
@@ -94,6 +94,7 @@
 - `migrations/20260912172000_site_test_integration.sql` — `capture_site_submission_v1` en security definer, `admin_test_site_integration` (bouton de test admin, sans CORS)
 - `migrations/20260912172500_fix_capture_function_privileges.sql` — **correctif de sécurité** : révoque EXECUTE de `anon`/`authenticated` sur `capture_site_submission_v1` (voir note de sécurité dans tasks.md)
 - `migrations/20260912180000_billing_stripe.sql` — plans, plan_prices, subscriptions, billing_events (staff seulement), `is_org_billing_active()`, plans/prix Stripe test seedés
+- `migrations/20260912190000_pilot_metrics.sql` — RPC `admin_pilot_metrics` (Phase 6)
 
 ## `supabase/functions/`
 
@@ -114,3 +115,4 @@
 - nginx : `/etc/nginx/sites-available/signa-app`
 - SSL : `/etc/letsencrypt/live/app.signaweb.ca/`
 - Supabase : projet `mnadbkbdbjmugvsadeen` (`ca-central-1`), identifiants dans `.input/supabase` (ignoré par Git) et `.env.local` (ignoré par Git)
+- Supabase Auth : `site_url` = `https://app.signaweb.ca`, `uri_allow_list` = `https://app.signaweb.ca/**` (corrigé le 2026-09-12, pointait vers `http://localhost:3000` par défaut — cassait tous les liens de courriel : confirmation, réinitialisation)

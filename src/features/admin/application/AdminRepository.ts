@@ -1,4 +1,4 @@
-import type { AuditEvent, OrganizationDetail, OrganizationSummary, PlanPrice, Site, Subscription } from '../domain/admin';
+import type { AuditEvent, OrganizationDetail, OrganizationSummary, PilotMetrics, PlanPrice, Site, Subscription } from '../domain/admin';
 
 export interface AdminRepository {
   listPlanPrices: () => Promise<PlanPrice[]>;
@@ -18,4 +18,5 @@ export interface AdminRepository {
   updateMembership: (membershipId: string, role: string, status: string, reason: string) => Promise<void>;
   listAuditEvents: () => Promise<AuditEvent[]>;
   revokeUserSessions: (userId: string, reason: string) => Promise<void>;
+  getPilotMetrics: () => Promise<PilotMetrics>;
 }

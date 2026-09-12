@@ -86,6 +86,22 @@
 - [x] Vérifié en navigateur réel (Playwright, production) : paiement Stripe complet avec vraie carte de test jusqu'au webhook et à la mise à jour de `subscriptions` ; MFA activé de bout en bout avec un vrai code TOTP généré ; garde-fous de rôle (client normal bloqué sur `create-checkout-session`)
 - [x] Vérifié la disponibilité des sauvegardes Supabase via l'API de gestion : **aucune sauvegarde ni PITR activés sur le palier actuel** (`pitr_enabled: false`, `backups: []`) — test de restauration impossible tant que ce n'est pas activé (palier payant requis, DEC-018)
 
+## Terminées (Phase 6, partiel) — 2026-09-12
+
+- [x] RPC `admin_pilot_metrics` + page `/admin/indicateurs` : organisations (total/actives/suspendues), projets par statut, soumissions de site (30j), organisations actives (7j), suivis en retard, abonnements par statut, sites actifs, actions admin (7j) — indicateurs du doc 13-ROADMAP
+- [x] **Export CSV réel** dans Prospects — était un faux bouton (juste un toast, aucune donnée exportée) depuis le début du prototype ; génère maintenant un vrai fichier CSV téléchargé (BOM UTF-8, colonnes complètes), vérifié en navigateur réel (Playwright, téléchargement effectif, contenu vérifié)
+- [x] **Bug de config réel trouvé par l'utilisateur en testant** : les liens de confirmation de courriel Supabase redirigeaient vers `http://localhost:3000` (réglage par défaut jamais changé) au lieu de `https://app.signaweb.ca`. Corrigé via l'API de gestion Supabase (`site_url`, `uri_allow_list`) — vérifié avec `generateLink` que le nouveau lien pointe bien vers le bon domaine
+- [x] Page `/reinitialiser-mot-de-passe` construite — **elle n'existait pas du tout** avant ce correctif ; le lien "mot de passe oublié" envoyait vers une route inexistante depuis la Phase 0
+
+## Ce que je ne peux pas faire pour la Phase 6
+
+Le pilote (3 à 5 vraies entreprises, doc 13-ROADMAP) est une activité commerciale — recruter et accompagner de vrais clients — pas une tâche d'ingénierie. Ça revient à Francis. Ce que j'ai livré : l'outillage (indicateurs) et corrigé de vrais bugs qui auraient bloqué un vrai client dès l'inscription (lien de confirmation cassé).
+
+## À faire avant de lancer un vrai pilote
+
+- [ ] Voir la liste complète des décisions en attente (sauvegardes, Stripe production, Loi 25, grâce de paiement) dans les sections Phase 5 ci-dessus — aucune n'est bloquante pour *tester* avec des comptes de confiance, mais toutes le sont pour de vrais clients payants
+- [ ] Vérifier s'il existe d'autres réglages Supabase par défaut jamais ajustés (courriels transactionnels — expéditeur, gabarits — n'ont pas été revus non plus)
+
 ## À faire (avant de clore la Phase 5)
 
 - [ ] Webhooks sortants (table `webhook_deliveries`) non construits — reportés jusqu'à l'apparition d'un vrai besoin (aucun consommateur externe pour l'instant ; Stripe en Phase 5 est un webhook *entrant*, pas concerné)

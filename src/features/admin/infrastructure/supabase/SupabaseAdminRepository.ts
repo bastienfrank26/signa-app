@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { AdminRepository } from '../../application/AdminRepository';
-import type { AuditEvent, OrganizationDetail, OrganizationSummary, PlanPrice, Site, Subscription } from '../../domain/admin';
+import type { AuditEvent, OrganizationDetail, OrganizationSummary, PilotMetrics, PlanPrice, Site, Subscription } from '../../domain/admin';
 
 export function createSupabaseAdminRepository(client: SupabaseClient): AdminRepository {
   return {
@@ -198,6 +198,12 @@ export function createSupabaseAdminRepository(client: SupabaseClient): AdminRepo
     async revokeUserSessions(userId, reason) {
       const { error } = await client.functions.invoke('revoke-user-sessions', { body: { userId, reason } });
       if (error) throw new Error('La révocation a échoué.');
+    },
+
+    async getPilotMetrics() {
+      const { data, error } = await client.rpc('admin_pilot_metrics');
+      if (error) throw new Error('Les indicateurs n’ont pas pu être chargés.');
+      return data as PilotMetrics;
     },
 
     async listAuditEvents() {

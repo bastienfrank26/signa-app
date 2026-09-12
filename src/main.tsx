@@ -8,11 +8,13 @@ import { RequireAuth, RequireNoAuth } from './features/auth/presentation/guards'
 import LoginPage from './features/auth/presentation/LoginPage';
 import SignUpPage from './features/auth/presentation/SignUpPage';
 import ForgotPasswordPage from './features/auth/presentation/ForgotPasswordPage';
+import ResetPasswordPage from './features/auth/presentation/ResetPasswordPage';
 import SecurityPage from './features/auth/presentation/SecurityPage';
 import RequireStaff from './features/admin/presentation/RequireStaff';
 import OrganizationsListPage from './features/admin/presentation/OrganizationsListPage';
 import OrganizationDetailPage from './features/admin/presentation/OrganizationDetailPage';
 import AuditLogPage from './features/admin/presentation/AuditLogPage';
+import PilotMetricsPage from './features/admin/presentation/PilotMetricsPage';
 import './styles/global.css';
 
 createRoot(document.getElementById('root')!).render(
@@ -20,6 +22,7 @@ createRoot(document.getElementById('root')!).render(
     <BrowserRouter>
       <AuthProvider>
         <Routes>
+          <Route path="/reinitialiser-mot-de-passe" element={<ResetPasswordPage />} />
           <Route element={<RequireNoAuth />}>
             <Route path="/connexion" element={<LoginPage />} />
             <Route path="/inscription" element={<SignUpPage />} />
@@ -31,6 +34,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/admin/organisations" element={<OrganizationsListPage />} />
               <Route path="/admin/organisations/:organizationId" element={<OrganizationDetailPage />} />
               <Route path="/admin/audit" element={<AuditLogPage />} />
+              <Route path="/admin/indicateurs" element={<PilotMetricsPage />} />
             </Route>
             <Route element={<RequireOrganization />}>
               <Route path="/*" element={<CrmPrototype />} />

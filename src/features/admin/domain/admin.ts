@@ -67,6 +67,19 @@ export interface Subscription {
   cancelAtPeriodEnd: boolean;
 }
 
+export interface PilotMetrics {
+  organizationsTotal: number;
+  organizationsActive: number;
+  organizationsSuspended: number;
+  projectsByStatus: Record<string, number>;
+  submissionsLast30d: number;
+  orgsWithActivityLast7d: number;
+  overdueFollowUps: number;
+  subscriptionsByStatus: Record<string, number>;
+  sitesActive: number;
+  auditEventsLast7d: number;
+}
+
 export interface AuditEvent {
   id: string;
   actorUserId: string | null;

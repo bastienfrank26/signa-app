@@ -55,6 +55,9 @@ export default function AdminLayout({ children }: PropsWithChildren) {
           <Link to="/admin/audit" style={navItemStyle(location.pathname.startsWith('/admin/audit'))}>
             Journal d'audit
           </Link>
+          <Link to="/admin/indicateurs" style={navItemStyle(location.pathname.startsWith('/admin/indicateurs'))}>
+            Indicateurs
+          </Link>
         </nav>
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 14, fontSize: 12.5, color: 'var(--sg-side-muted)' }}>
           <span>Rôle : {role}</span>
