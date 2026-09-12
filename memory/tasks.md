@@ -72,11 +72,33 @@
 
 **Toute nouvelle fonction Postgres qui insère/modifie des données sans vérifier explicitement l'autorisation dans son propre corps doit révoquer EXECUTE de `anon` ET `authenticated` explicitement** (pas seulement `PUBLIC` — Supabase accorde EXECUTE à ces deux rôles par défaut à la création, indépendamment de PUBLIC). Vérifier avec un test d'intrusion (utilisateur authentifié quelconque qui tente l'appel direct) avant de considérer une fonction sensible comme terminée. Toutes les fonctions existantes ont été auditées le 2026-09-12 ; seule `capture_site_submission_v1` avait ce problème.
 
-## À faire (avant Phase 5)
+## Terminées (Phase 5, partiel) — 2026-09-12
+
+- [x] Docs produit copiées dans le dépôt (`docs/00` à `docs/14`, depuis le projet Design), annotées avec l'état réel d'implémentation à chaque section
+- [x] `docs/14-DECISIONS.md` mis à jour : DEC-009 et DEC-012 remplacées (stack réelle : Vite/React/Supabase, pas Next.js/Cloudflare/Drizzle), nouvelles décisions DEC-015 à DEC-019 (inscription libre temporaire, sauvegardes à activer, Stripe en mode test)
+- [x] Gabarits Loi 25 rédigés (`docs/loi25/politique-confidentialite.md`, `registre-traitements.md`, `procedure-incident.md`) — **brouillons, non validés légalement, champs `[À DÉCIDER]`/`[À DÉSIGNER]` à compléter avec un avocat avant publication**
+- [x] Stripe : produit + 2 prix créés en **mode test** (129$/149$, `prod_VFOaESoM6OOPUz`), tables `plans`/`plan_prices`/`subscriptions`/`billing_events`, Edge Function `stripe-webhook` (signature vérifiée, idempotent par `stripe_event_id`), Edge Function `create-checkout-session` (staff seulement), `is_org_billing_active()` (calcule le droit d'accès mais **ne bloque encore rien** — décision produit à prendre)
+- [x] Section "Abonnement" dans l'admin : statut, génération de lien de paiement
+- [x] MFA TOTP en self-service (`/parametres/securite`, tous les utilisateurs) — enrôlement, QR code, vérification, désactivation
+- [x] Révocation de session par le personnel Signa (`revoke-user-sessions`, motif obligatoire, audité), bouton dans la fiche membre de l'admin
+- [x] Lien "Sécurité" et "Déconnexion" ajoutés au Header (absents auparavant)
+- [x] **Deux bugs réels trouvés et corrigés pendant les tests Stripe** : (1) Stripe a déplacé `current_period_end` vers l'item d'abonnement dans les versions d'API récentes — le webhook plantait silencieusement sur chaque `customer.subscription.*` ; (2) `create-checkout-session` appelait un RPC gardé par `is_internal_staff()`/`auth.uid()` avec le rôle de service (qui n'a pas de session utilisateur) — corrigé par une lecture directe `memberships`+`auth.admin.getUserById`
+- [x] Vérifié en navigateur réel (Playwright, production) : paiement Stripe complet avec vraie carte de test jusqu'au webhook et à la mise à jour de `subscriptions` ; MFA activé de bout en bout avec un vrai code TOTP généré ; garde-fous de rôle (client normal bloqué sur `create-checkout-session`)
+- [x] Vérifié la disponibilité des sauvegardes Supabase via l'API de gestion : **aucune sauvegarde ni PITR activés sur le palier actuel** (`pitr_enabled: false`, `backups: []`) — test de restauration impossible tant que ce n'est pas activé (palier payant requis, DEC-018)
+
+## À faire (avant de clore la Phase 5)
 
 - [ ] Webhooks sortants (table `webhook_deliveries`) non construits — reportés jusqu'à l'apparition d'un vrai besoin (aucun consommateur externe pour l'instant ; Stripe en Phase 5 est un webhook *entrant*, pas concerné)
 - [ ] Détection de doublons de contacts (doc 06 : "signalés sans fusion destructive automatique") non implémentée — chaque soumission crée un nouveau contact, même si l'adresse courriel existe déjà
 - [ ] Notifications (table dédiée) pas construites — une activité CRM sert d'équivalent visible pour l'instant, pas de courriel envoyé au client à la réception d'un prospect
+- [ ] **DEC-018 (décision commerciale requise)** : passer le projet Supabase à un palier payant pour activer les sauvegardes/PITR — impossible de tester une restauration tant que ce n'est pas fait
+- [ ] **DEC-019 (décision commerciale requise)** : recréer produit/prix Stripe en mode production (`sk_live_`/`pk_live_`) avant tout paiement réel, une fois les montants finaux confirmés
+- [ ] `is_org_billing_active()` existe mais ne bloque rien — décision produit à prendre : qu'est-ce qui doit se passer concrètement quand un compte n'est plus payant (lecture seule ? blocage complet ? après combien de temps ?)
+- [ ] Séparation dev/staging/prod inexistante — un seul projet Supabase sert à tout, y compris les tests de cette session (nettoyés après coup, mais risque réel si oublié)
+- [ ] Courriels transactionnels (accueil, échec de paiement, etc.) non envoyés — pas de fournisseur SMTP configuré (voir aussi le point équivalent noté en Phase 0/1)
+- [ ] Observabilité (erreurs, latence, alertes) non instrumentée — seuls les logs bruts Supabase existent
+- [ ] Gabarits Loi 25 (`docs/loi25/`) à faire valider par un avocat, responsable de la protection des renseignements personnels à désigner, durées de conservation à trancher
+- [ ] DEC-015 (inscription libre) contredit toujours DEC-003 (Signa crée le compte après paiement) — à trancher avant le pilote commercial
 
 - [ ] Console admin ne permet pas encore de créer une organisation pour un client (le flux MVP réel : "Signa crée le compte après paiement", avec invitation) — reporté, dépend de la table `invitations` (existe depuis Phase 0, jamais utilisée) et d'un flux de rédemption côté client, non construits
 - [ ] Sections Modules/Sites/Abonnements de l'administration pas construites — aucune table ne les supporte encore (Phase 3/4/5)

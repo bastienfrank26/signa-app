@@ -24,7 +24,7 @@
 - `domain/auth.ts` — `AppSession`, `Membership`, `MembershipRole`, `AuthFailure`
 - `application/AuthGateway.ts` — interface (port)
 - `infrastructure/supabase/SupabaseAuthGateway.ts` — implémentation Supabase (signUp/signIn/signOut/reset/current_app_session)
-- `presentation/` — `AuthProvider.tsx`, `AuthContext.ts`, `useAuth.ts`, `guards.tsx` (RequireAuth/RequireNoAuth), `AuthLayout.tsx`, `LoginPage.tsx`, `SignUpPage.tsx`, `ForgotPasswordPage.tsx`, `formStyles.ts`
+- `presentation/` — `AuthProvider.tsx`, `AuthContext.ts`, `useAuth.ts`, `guards.tsx` (RequireAuth/RequireNoAuth), `AuthLayout.tsx`, `LoginPage.tsx`, `SignUpPage.tsx`, `ForgotPasswordPage.tsx`, `formStyles.ts`, `SecurityPage.tsx` (Phase 5 : enrôlement MFA TOTP, `/parametres/securite`)
 
 ## `src/features/organizations/` (Phase 0, minimal)
 
@@ -47,7 +47,7 @@
 - `infrastructure/supabase/SupabaseAdminRepository.ts` — liste/détail organisations, RPC admin (statuts, étapes, memberships), audit
 - `presentation/useStaffRole.ts` — hook + instance partagée du repository (`adminRepository`)
 - `presentation/RequireStaff.tsx` — garde de route (affiche "Accès refusé" si non-personnel)
-- `presentation/AdminLayout.tsx`, `OrganizationsListPage.tsx`, `OrganizationDetailPage.tsx`, `AuditLogPage.tsx`, `ReasonDialog.tsx` (motif obligatoire réutilisable), `SitesSection.tsx` (Phase 4 : création/rotation/statut de site, secret affiché une fois)
+- `presentation/AdminLayout.tsx`, `OrganizationsListPage.tsx`, `OrganizationDetailPage.tsx`, `AuditLogPage.tsx`, `ReasonDialog.tsx` (motif obligatoire réutilisable), `SitesSection.tsx` (Phase 4 : création/rotation/statut de site, secret affiché une fois), `BillingSection.tsx` (Phase 5 : statut d'abonnement, lien de paiement)
 
 ## `src/features/crm/` (Phase 3)
 
@@ -93,10 +93,20 @@
 - `migrations/20260912171500_site_integrations_write_policies.sql` — correctif RLS (policies INSERT/UPDATE manquantes sur sites/api_keys)
 - `migrations/20260912172000_site_test_integration.sql` — `capture_site_submission_v1` en security definer, `admin_test_site_integration` (bouton de test admin, sans CORS)
 - `migrations/20260912172500_fix_capture_function_privileges.sql` — **correctif de sécurité** : révoque EXECUTE de `anon`/`authenticated` sur `capture_site_submission_v1` (voir note de sécurité dans tasks.md)
+- `migrations/20260912180000_billing_stripe.sql` — plans, plan_prices, subscriptions, billing_events (staff seulement), `is_org_billing_active()`, plans/prix Stripe test seedés
 
 ## `supabase/functions/`
 
 - `site-submissions/` (Phase 4) — Edge Function publique, `POST /site-submissions/{siteId}`, auth par clé de site hachée (`x-signa-site-key`), CORS par origine déclarée, déployée avec `--no-verify-jwt`
+- `stripe-webhook/` (Phase 5) — signature Stripe vérifiée sur le corps brut, idempotent (`billing_events.stripe_event_id`), `--no-verify-jwt`
+- `create-checkout-session/` (Phase 5) — staff seulement (vérifie `current_staff_role` via le JWT de l'appelant), crée une session Stripe Checkout
+- `revoke-user-sessions/` (Phase 5) — staff seulement, déconnecte un utilisateur de tous ses appareils (`auth.admin.signOut`), audité
+
+## `docs/` (Phase 5)
+
+- `00` à `14` — copie annotée de la documentation produit du projet Design, avec l'état réel d'implémentation à jour au 2026-09-12
+- `14-DECISIONS.md` — registre des décisions mis à jour (DEC-009/012 remplacées, DEC-015 à DEC-019 ajoutées)
+- `loi25/` — gabarits de travail (politique de confidentialité, registre des traitements, procédure incident) : **brouillons non validés légalement**, voir `docs/loi25/README.md`
 
 ## Infrastructure (hors dépôt Git)
 

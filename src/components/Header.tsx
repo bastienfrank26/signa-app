@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useAuth } from '../features/auth/presentation/useAuth';
 import { initials } from '../AppContext';
 
@@ -9,7 +10,7 @@ const roleLabels: Record<string, string> = {
 };
 
 export default function Header() {
-  const { session } = useAuth();
+  const { session, signOut } = useAuth();
   const membership = session?.memberships[0];
 
   return (
@@ -63,6 +64,15 @@ export default function Header() {
             <div style={{ fontSize: 11, color: '#7A8899' }}>{membership ? roleLabels[membership.role] ?? membership.role : ''}</div>
           </div>
         </div>
+        <Link to="/parametres/securite" style={{ fontSize: 12.5, color: 'var(--sg-slate-400)' }}>
+          Sécurité
+        </Link>
+        <button
+          onClick={() => void signOut()}
+          style={{ padding: 0, border: 'none', background: 'none', fontSize: 12.5, color: 'var(--sg-slate-400)', cursor: 'pointer' }}
+        >
+          Déconnexion
+        </button>
       </div>
     </header>
   );

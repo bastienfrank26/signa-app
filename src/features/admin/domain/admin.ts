@@ -52,6 +52,21 @@ export interface Site {
   keyPrefix: string | null;
 }
 
+export interface PlanPrice {
+  id: string;
+  stripePriceId: string;
+  commitment: 'annual' | 'none';
+  unitAmountCents: number;
+}
+
+export interface Subscription {
+  status: string;
+  commitment: 'annual' | 'none' | null;
+  unitAmountCents: number | null;
+  currentPeriodEnd: string | null;
+  cancelAtPeriodEnd: boolean;
+}
+
 export interface AuditEvent {
   id: string;
   actorUserId: string | null;

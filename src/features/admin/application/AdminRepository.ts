@@ -1,6 +1,9 @@
-import type { AuditEvent, OrganizationDetail, OrganizationSummary, Site } from '../domain/admin';
+import type { AuditEvent, OrganizationDetail, OrganizationSummary, PlanPrice, Site, Subscription } from '../domain/admin';
 
 export interface AdminRepository {
+  listPlanPrices: () => Promise<PlanPrice[]>;
+  getSubscription: (organizationId: string) => Promise<Subscription | null>;
+  createCheckoutLink: (organizationId: string, stripePriceId: string) => Promise<string>;
   listSites: (organizationId: string) => Promise<Site[]>;
   createSite: (organizationId: string, name: string, allowedOrigins: string[]) => Promise<{ siteId: string; secret: string }>;
   rotateSiteKey: (siteId: string) => Promise<{ secret: string }>;
@@ -14,4 +17,5 @@ export interface AdminRepository {
   setStepStatus: (stepId: string, status: string) => Promise<void>;
   updateMembership: (membershipId: string, role: string, status: string, reason: string) => Promise<void>;
   listAuditEvents: () => Promise<AuditEvent[]>;
+  revokeUserSessions: (userId: string, reason: string) => Promise<void>;
 }

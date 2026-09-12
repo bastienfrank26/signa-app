@@ -9,10 +9,10 @@ Plan de développement complet : voir `/root/.claude/plans/mellow-toasting-dahl.
 - [x] Phase 2 — Administration Signa : organisations, accès, projets web, audit (terminée 2026-09-12 ; modules/sites/abonnements reportés, voir tasks.md — pas de table backing avant Phase 3/4/5)
 - [x] Phase 3 — CRM réel : contacts/pipelines/opportunités/activités/tâches branchés à Supabase, prototype visuel réutilisé sans refonte (terminée 2026-09-12, détail dans `tasks.md`)
 - [x] Phase 4 — Intégrations de sites : `siteId`, clés, soumissions idempotentes, Edge Function `site-submissions` (terminée 2026-09-12, détail dans `tasks.md` — inclut une faille de sécurité trouvée et corrigée en cours de route)
-- [ ] Phase 5 — Production : Stripe, MFA, Loi 25, sauvegardes, observabilité
+- [~] Phase 5 — Production : **en cours**. Fait : Stripe (webhooks + lien de paiement), MFA TOTP, révocation de session, gabarits Loi 25. Reste : sauvegardes (décision commerciale requise, palier Supabase actuel n'en a aucune), courriels transactionnels, observabilité, séparation dev/prod. Détail dans `tasks.md`
 - [ ] Phase 6 — Pilote : 3 à 5 entreprises réelles
 - [ ] Phase 7 — Expansion : module Rendez-vous ou Appels de service (DEC-014)
 
 ## Prochaine étape immédiate
 
-Phase 5 — Production (Stripe, MFA, Loi 25, sauvegardes, observabilité). Voir `tasks.md` pour ce qui reste ouvert des phases précédentes.
+Terminer la Phase 5 : décision sur les sauvegardes (DEC-018, coût récurrent), courriels transactionnels, observabilité minimale, puis Phase 6 (pilote). Voir `tasks.md`.

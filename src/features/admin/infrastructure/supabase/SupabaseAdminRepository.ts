@@ -1,9 +1,45 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { AdminRepository } from '../../application/AdminRepository';
-import type { AuditEvent, OrganizationDetail, OrganizationSummary, Site } from '../../domain/admin';
+import type { AuditEvent, OrganizationDetail, OrganizationSummary, PlanPrice, Site, Subscription } from '../../domain/admin';
 
 export function createSupabaseAdminRepository(client: SupabaseClient): AdminRepository {
   return {
+    async listPlanPrices() {
+      const { data, error } = await client.from('plan_prices').select('*').eq('active', true).order('unit_amount_cents');
+      if (error) throw new Error('Les tarifs n’ont pas pu être chargés.');
+      return (data ?? []).map((row) => ({
+        id: row.id as string,
+        stripePriceId: row.stripe_price_id as string,
+        commitment: row.commitment as PlanPrice['commitment'],
+        unitAmountCents: row.unit_amount_cents as number,
+      }));
+    },
+
+    async getSubscription(organizationId) {
+      const { data, error } = await client
+        .from('subscriptions')
+        .select('*, plan_prices(commitment, unit_amount_cents)')
+        .eq('organization_id', organizationId)
+        .maybeSingle();
+      if (error) throw new Error('L’abonnement n’a pas pu être chargé.');
+      if (!data) return null;
+      const price = data.plan_prices as { commitment: string; unit_amount_cents: number } | null;
+      return {
+        status: data.status as string,
+        commitment: (price?.commitment as Subscription['commitment']) ?? null,
+        unitAmountCents: price?.unit_amount_cents ?? null,
+        currentPeriodEnd: (data.current_period_end as string | null) ?? null,
+        cancelAtPeriodEnd: data.cancel_at_period_end as boolean,
+      };
+    },
+
+    async createCheckoutLink(organizationId, stripePriceId) {
+      const { data, error } = await client.functions.invoke('create-checkout-session', {
+        body: { organizationId, stripePriceId },
+      });
+      if (error) throw new Error('La création du lien de paiement a échoué.');
+      return data.url as string;
+    },
     async listSites(organizationId) {
       const { data, error } = await client.rpc('admin_list_sites', { p_org_id: organizationId });
       if (error) throw new Error('Les sites n’ont pas pu être chargés.');
@@ -157,6 +193,11 @@ export function createSupabaseAdminRepository(client: SupabaseClient): AdminRepo
         p_reason: reason,
       });
       if (error) throw new Error(error.message);
+    },
+
+    async revokeUserSessions(userId, reason) {
+      const { error } = await client.functions.invoke('revoke-user-sessions', { body: { userId, reason } });
+      if (error) throw new Error('La révocation a échoué.');
     },
 
     async listAuditEvents() {

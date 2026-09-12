@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import AdminLayout from './AdminLayout';
 import ReasonDialog from './ReasonDialog';
 import SitesSection from './SitesSection';
+import BillingSection from './BillingSection';
 import { adminRepository } from './useStaffRole';
 import type { OrganizationDetail } from '../domain/admin';
 import { projectStatuses, projectStatusLabels } from '../../portal/domain/project';
@@ -15,6 +16,7 @@ export default function OrganizationDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [dialog, setDialog] = useState<null | { kind: 'suspend' | 'reactivate' }>(null);
+  const [revokeUserId, setRevokeUserId] = useState<string | null>(null);
   const [statusDraft, setStatusDraft] = useState<string>('');
   const [statusReasonOpen, setStatusReasonOpen] = useState(false);
 
@@ -72,6 +74,12 @@ export default function OrganizationDetailPage() {
                   <div style={{ fontWeight: 700 }}>{m.email}</div>
                   <div style={{ fontSize: 12, color: 'var(--sg-text-muted)' }}>{m.role} · {m.status}</div>
                 </div>
+                <button
+                  onClick={() => setRevokeUserId(m.userId)}
+                  style={{ fontSize: 12, padding: '6px 10px', borderRadius: 8, border: '1px solid var(--sg-border-strong)', background: '#fff', cursor: 'pointer' }}
+                >
+                  Déconnecter partout
+                </button>
               </div>
             ))}
             {detail.memberships.length === 0 && <div style={{ color: 'var(--sg-text-muted)', fontSize: 13 }}>Aucun membre.</div>}
@@ -120,6 +128,7 @@ export default function OrganizationDetailPage() {
           </section>
         )}
 
+        <BillingSection organizationId={detail.id} />
         <SitesSection organizationId={detail.id} />
       </div>
 
@@ -144,6 +153,17 @@ export default function OrganizationDetailPage() {
             await adminRepository.setOrganizationStatus(detail.id, 'active', reason);
             setDialog(null);
             await reload();
+          }}
+        />
+      )}
+      {revokeUserId && (
+        <ReasonDialog
+          title="Déconnecter cet utilisateur de tous ses appareils"
+          confirmLabel="Déconnecter"
+          onCancel={() => setRevokeUserId(null)}
+          onConfirm={async (reason) => {
+            await adminRepository.revokeUserSessions(revokeUserId, reason);
+            setRevokeUserId(null);
           }}
         />
       )}

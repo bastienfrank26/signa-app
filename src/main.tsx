@@ -8,6 +8,7 @@ import { RequireAuth, RequireNoAuth } from './features/auth/presentation/guards'
 import LoginPage from './features/auth/presentation/LoginPage';
 import SignUpPage from './features/auth/presentation/SignUpPage';
 import ForgotPasswordPage from './features/auth/presentation/ForgotPasswordPage';
+import SecurityPage from './features/auth/presentation/SecurityPage';
 import RequireStaff from './features/admin/presentation/RequireStaff';
 import OrganizationsListPage from './features/admin/presentation/OrganizationsListPage';
 import OrganizationDetailPage from './features/admin/presentation/OrganizationDetailPage';
@@ -25,6 +26,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/mot-de-passe-oublie" element={<ForgotPasswordPage />} />
           </Route>
           <Route element={<RequireAuth />}>
+            <Route path="/parametres/securite" element={<SecurityPage />} />
             <Route element={<RequireStaff />}>
               <Route path="/admin/organisations" element={<OrganizationsListPage />} />
               <Route path="/admin/organisations/:organizationId" element={<OrganizationDetailPage />} />
