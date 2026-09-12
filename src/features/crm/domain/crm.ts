@@ -51,3 +51,25 @@ export interface NewProspectInput {
   need: string;
   valueCents: number;
 }
+
+export interface Contact {
+  id: string;
+  name: string;
+  companyName: string;
+  email: string;
+  phone: string;
+  source: string;
+  createdAt: string;
+}
+
+export interface NewContactInput {
+  name: string;
+  companyName?: string;
+  email?: string;
+  phone?: string;
+}
+
+export interface ContactDetail extends Contact {
+  opportunities: Prospect[];
+  activities: ActivityItem[];
+}

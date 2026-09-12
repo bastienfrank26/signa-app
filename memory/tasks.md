@@ -86,6 +86,20 @@
 - [x] Vérifié en navigateur réel (Playwright, production) : paiement Stripe complet avec vraie carte de test jusqu'au webhook et à la mise à jour de `subscriptions` ; MFA activé de bout en bout avec un vrai code TOTP généré ; garde-fous de rôle (client normal bloqué sur `create-checkout-session`)
 - [x] Vérifié la disponibilité des sauvegardes Supabase via l'API de gestion : **aucune sauvegarde ni PITR activés sur le palier actuel** (`pitr_enabled: false`, `backups: []`) — test de restauration impossible tant que ce n'est pas activé (palier payant requis, DEC-018)
 
+## Terminées (module CRM Contacts, hors phases) — 2026-09-12
+
+- [x] Écran Contacts réel (`ContactsScreen.tsx`, liste + recherche + création) — remplace le stub. Table `contacts` existait déjà depuis Phase 3 (RLS déjà correcte, aucune migration nécessaire)
+- [x] `ContactDrawer.tsx` : fiche (coordonnées, occasions liées via `opportunities.contact_id`, historique d'activités, ajout de note)
+- [x] `NewContactModal.tsx` : création manuelle (nom requis, entreprise/courriel/téléphone optionnels)
+- [x] Repo étendu : `CrmRepository.listContacts/createContact/getContactDetail/addContactNote` + implémentation Supabase + hook `useContacts.ts` (`features/crm/presentation/`, patron `useProjectBundle.ts`)
+- [x] Branché dans Sidebar (déjà présent via `navigation.ts`) et feuille mobile « Plus » — aucun changement de nav nécessaire, seul l'écran manquait
+- [x] Vérifié avec Playwright (compte de test, voir plus bas) : création, fiche, ajout d'activité, accès mobile — zéro erreur console
+
+## Reste du module CRM (Tâches, Fichiers)
+
+- [ ] Écran Tâches dédié (`taches`, toujours stub) — table `tasks` déjà en base (Phase 3), juste la vue manque (liste filtrable, création, assignation)
+- [ ] Fichiers CRM (`fichiers`, toujours stub) — **aucune table** pour ça (contrairement à Contacts/Tâches) ; `project_files` existe mais sert le portail client, pas le CRM. Nécessite migration (table + policies RLS + bucket Storage) avant l'écran
+
 ## Terminées (branche `design/mobile-nav`, hors phases) — 2026-09-12
 
 - [x] Navigation mobile réelle du shell client/CRM (`Sidebar`/`Header`/`App.tsx`) — remplace le faux toggle Bureau/Mobile (cadre de téléphone dans la page). Barre d'onglets fixe (`MobileNav`) + feuille secondaire (`MobileMoreSheet`), seuil CSS 768 px (`.sg-desktop-only`/`.sg-mobile-only`), zone sûre iOS (`env(safe-area-inset-bottom)`)

@@ -23,6 +23,14 @@
 - `data/seed.ts` — données de démonstration CRM (à déplacer en `infrastructure/fixtures/` par feature)
 - `infrastructure/supabase/client.ts` — client Supabase unique (`VITE_SUPABASE_URL`/`VITE_SUPABASE_PUBLISHABLE_KEY`)
 
+## `src/features/crm/` (Phase 3, module Contacts ajouté 2026-09-12)
+
+- `domain/crm.ts` — `Prospect`, `Stage`, `ActivityItem`, `Task`, `Contact`, `ContactDetail`, `NewContactInput`
+- `application/CrmRepository.ts` — interface (port), inclut `listContacts`/`createContact`/`getContactDetail`/`addContactNote`
+- `infrastructure/supabase/SupabaseCrmRepository.ts` — implémentation Supabase
+- `presentation/useContacts.ts` — hook de chargement/rechargement des contacts (patron `useProjectBundle.ts`)
+- `src/components/ContactsScreen.tsx`, `ContactDrawer.tsx`, `NewContactModal.tsx` — écran Contacts (liste, fiche, création)
+
 ## `src/features/auth/` (Phase 0)
 
 - `domain/auth.ts` — `AppSession`, `Membership`, `MembershipRole`, `AuthFailure`

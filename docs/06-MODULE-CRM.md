@@ -45,8 +45,10 @@ Les doublons sont signalés sans fusion destructive automatique — non impléme
 - aperçu avec nouveaux prospects, valeur et suivis en retard;
 - liste filtrable;
 - pipeline adapté au mobile;
-- fiche avec coordonnées, occasions, activités et fichiers;
-- liste personnelle de tâches.
+- fiche avec coordonnées, occasions, activités et fichiers — **fichiers non construits** (aucune table CRM pour ça, contrairement aux coordonnées/occasions/activités, construites le 2026-09-12);
+- liste personnelle de tâches — **non construite** (les tâches restent visibles seulement en résumé sur Accueil; écran dédié `taches` toujours un stub).
+
+> Note (2026-09-12) : écran Contacts construit (`ContactsScreen.tsx`/`ContactDrawer.tsx`/`NewContactModal.tsx`, hook `useContacts.ts`) — table `contacts` déjà en place depuis Phase 3, seule la vue manquait. Tâches et Fichiers restent des stubs (`StubScreen.tsx`).
 
 ## Règles
 

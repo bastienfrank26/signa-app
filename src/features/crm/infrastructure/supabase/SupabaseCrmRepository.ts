@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { CrmRepository } from '../../application/CrmRepository';
-import type { ActivityItem, CrmBundle, NewProspectInput, Prospect, Stage, Task } from '../../domain/crm';
+import type { ActivityItem, Contact, ContactDetail, CrmBundle, NewContactInput, NewProspectInput, Prospect, Stage, Task } from '../../domain/crm';
 
 function mapStage(row: Record<string, unknown>): Stage {
   return {
@@ -38,6 +38,18 @@ function mapActivity(row: Record<string, unknown>): ActivityItem {
     contactName: (contact?.name as string) ?? null,
     note: row.note as string,
     activityType: row.activity_type as string,
+    createdAt: row.created_at as string,
+  };
+}
+
+function mapContact(row: Record<string, unknown>): Contact {
+  return {
+    id: row.id as string,
+    name: row.name as string,
+    companyName: (row.company_name as string) ?? '',
+    email: (row.email as string) ?? '',
+    phone: (row.phone as string) ?? '',
+    source: (row.source as string) ?? '',
     createdAt: row.created_at as string,
   };
 }
@@ -152,6 +164,66 @@ export function createSupabaseCrmRepository(client: SupabaseClient): CrmReposito
     async toggleTask(taskId, done) {
       const { error } = await client.from('tasks').update({ done }).eq('id', taskId);
       if (error) throw new Error('La tâche n’a pas pu être mise à jour.');
+    },
+
+    async listContacts(organizationId) {
+      const { data, error } = await client
+        .from('contacts')
+        .select('*')
+        .eq('organization_id', organizationId)
+        .is('deleted_at', null)
+        .order('created_at', { ascending: false });
+      if (error) throw new Error('Les contacts n’ont pas pu être chargés.');
+      return (data ?? []).map(mapContact);
+    },
+
+    async createContact(organizationId, input: NewContactInput) {
+      const { error } = await client.from('contacts').insert({
+        organization_id: organizationId,
+        name: input.name,
+        company_name: input.companyName || null,
+        email: input.email || null,
+        phone: input.phone || null,
+        source: 'Création manuelle',
+      });
+      if (error) throw new Error('Le contact n’a pas pu être créé.');
+    },
+
+    async getContactDetail(contactId) {
+      const [contactRes, opportunitiesRes, activitiesRes] = await Promise.all([
+        client.from('contacts').select('*').eq('id', contactId).single(),
+        client
+          .from('opportunities')
+          .select('*, contacts(name, company_name, email, phone, source)')
+          .eq('contact_id', contactId)
+          .is('deleted_at', null)
+          .order('created_at', { ascending: false }),
+        client
+          .from('activities')
+          .select('*, contacts(name)')
+          .eq('contact_id', contactId)
+          .order('created_at', { ascending: false })
+          .limit(100),
+      ]);
+      if (contactRes.error || !contactRes.data) throw new Error('Le contact n’a pas pu être chargé.');
+      if (opportunitiesRes.error || activitiesRes.error) throw new Error('La fiche du contact n’a pas pu être chargée complètement.');
+      return {
+        ...mapContact(contactRes.data),
+        opportunities: (opportunitiesRes.data ?? []).map(mapProspect),
+        activities: (activitiesRes.data ?? []).map(mapActivity),
+      };
+    },
+
+    async addContactNote(organizationId, contactId, note) {
+      const { data: userData } = await client.auth.getUser();
+      const { error } = await client.from('activities').insert({
+        organization_id: organizationId,
+        contact_id: contactId,
+        author_id: userData.user?.id,
+        activity_type: 'note',
+        note,
+      });
+      if (error) throw new Error('L’activité n’a pas pu être enregistrée.');
     },
   };
 }
