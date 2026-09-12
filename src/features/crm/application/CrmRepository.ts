@@ -1,4 +1,4 @@
-import type { Contact, ContactDetail, CrmBundle, NewContactInput, NewProspectInput } from '../domain/crm';
+import type { Contact, ContactDetail, CrmBundle, NewContactInput, NewProspectInput, NewTaskInput } from '../domain/crm';
 
 export interface CrmRepository {
   getBundle: (organizationId: string) => Promise<CrmBundle>;
@@ -6,6 +6,7 @@ export interface CrmRepository {
   moveStage: (opportunityId: string, stageId: string) => Promise<void>;
   addActivityNote: (organizationId: string, opportunityId: string, contactId: string, note: string) => Promise<void>;
   toggleTask: (taskId: string, done: boolean) => Promise<void>;
+  createTask: (organizationId: string, input: NewTaskInput) => Promise<void>;
   listContacts: (organizationId: string) => Promise<Contact[]>;
   createContact: (organizationId: string, input: NewContactInput) => Promise<void>;
   getContactDetail: (contactId: string) => Promise<ContactDetail>;

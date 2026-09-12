@@ -6,6 +6,7 @@ import HomeScreen from './components/HomeScreen';
 import ProspectsScreen from './components/ProspectsScreen';
 import PipelineScreen from './components/PipelineScreen';
 import ContactsScreen from './components/ContactsScreen';
+import TasksScreen from './components/TasksScreen';
 import StubScreen from './components/StubScreen';
 import ProjectDashboardPage from './features/portal/presentation/ProjectDashboardPage';
 import ProspectDrawer from './components/ProspectDrawer';
@@ -18,6 +19,7 @@ function MainScreen() {
   if (screen === 'prospects') return <ProspectsScreen />;
   if (screen === 'pipeline') return <PipelineScreen />;
   if (screen === 'contacts') return <ContactsScreen />;
+  if (screen === 'taches') return <TasksScreen />;
   if (screen === 'projet') return <ProjectDashboardPage />;
   return <StubScreen />;
 }

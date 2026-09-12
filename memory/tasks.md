@@ -95,10 +95,18 @@
 - [x] Branché dans Sidebar (déjà présent via `navigation.ts`) et feuille mobile « Plus » — aucun changement de nav nécessaire, seul l'écran manquait
 - [x] Vérifié avec Playwright (compte de test, voir plus bas) : création, fiche, ajout d'activité, accès mobile — zéro erreur console
 
-## Reste du module CRM (Tâches, Fichiers)
+## Terminées (module CRM Tâches) — 2026-09-12
 
-- [ ] Écran Tâches dédié (`taches`, toujours stub) — table `tasks` déjà en base (Phase 3), juste la vue manque (liste filtrable, création, assignation)
-- [ ] Fichiers CRM (`fichiers`, toujours stub) — **aucune table** pour ça (contrairement à Contacts/Tâches) ; `project_files` existe mais sert le portail client, pas le CRM. Nécessite migration (table + policies RLS + bucket Storage) avant l'écran
+- [x] Écran Tâches réel (`TasksScreen.tsx`, filtres À faire/En retard/Terminées/Toutes, bascule fait/à faire réutilise `toggleTask` existant) — remplace le stub. Table `tasks` existait déjà depuis Phase 3
+- [x] `NewTaskModal.tsx` : création (titre requis, description/échéance/urgent optionnels), assignée au créateur par défaut — pas d'UI d'assignation à un autre membre pour l'instant (équipe petite, doc ne l'exige pas encore)
+- [x] `CrmRepository.createTask` + implémentation Supabase
+- [x] `AppContext` : `reload` exposé dans les actions (au lieu d'ajouter encore des champs d'état pour la modale) — les tâches faisaient déjà partie du `CrmBundle`, contrairement aux contacts qui ont leur propre hook
+- [x] Vérifié avec Playwright (compte de test) : création, filtres, badge Sidebar, accès mobile — zéro erreur console
+
+## Reste du module CRM (Fichiers)
+
+- [ ] Fichiers CRM (`fichiers`, toujours stub) — **aucune table** pour ça (contrairement à Contacts/Tâches, maintenant construits) ; `project_files` existe mais sert le portail client, pas le CRM. Nécessite migration (table + policies RLS + bucket Storage) avant l'écran
+- [ ] Pas d'UI d'assignation de tâche à un autre membre de l'équipe (assignée au créateur seulement pour l'instant) — à ajouter si le besoin se confirme
 
 ## Terminées (branche `design/mobile-nav`, hors phases) — 2026-09-12
 

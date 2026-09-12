@@ -68,6 +68,7 @@ interface AppActions {
   approve: () => void;
   askRevision: () => void;
   showToast: (msg: string) => void;
+  reload: () => Promise<void>;
 }
 
 const AppStateContext = createContext<AppState | null>(null);
@@ -242,9 +243,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       approve: () => setScreen('projet'),
       askRevision: () => setScreen('projet'),
       showToast,
+      reload,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [fName, fSub, fValue, note, selectedId, bundle, organizationId],
+    [fName, fSub, fValue, note, selectedId, bundle, organizationId, reload],
   );
 
   return (

@@ -2,7 +2,6 @@ import { useAppActions, useAppState } from '../AppContext';
 
 const TITLES: Record<string, string> = {
   fichiers: 'Fichiers',
-  taches: 'Tâches',
 };
 
 export default function StubScreen() {

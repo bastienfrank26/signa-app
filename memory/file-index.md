@@ -30,6 +30,7 @@
 - `infrastructure/supabase/SupabaseCrmRepository.ts` — implémentation Supabase
 - `presentation/useContacts.ts` — hook de chargement/rechargement des contacts (patron `useProjectBundle.ts`)
 - `src/components/ContactsScreen.tsx`, `ContactDrawer.tsx`, `NewContactModal.tsx` — écran Contacts (liste, fiche, création)
+- `src/components/TasksScreen.tsx`, `NewTaskModal.tsx` — écran Tâches (filtres, création), lit `AppContext` directement (tâches déjà dans `CrmBundle`)
 
 ## `src/features/auth/` (Phase 0)
 

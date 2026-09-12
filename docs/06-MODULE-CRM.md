@@ -46,9 +46,9 @@ Les doublons sont signalés sans fusion destructive automatique — non impléme
 - liste filtrable;
 - pipeline adapté au mobile;
 - fiche avec coordonnées, occasions, activités et fichiers — **fichiers non construits** (aucune table CRM pour ça, contrairement aux coordonnées/occasions/activités, construites le 2026-09-12);
-- liste personnelle de tâches — **non construite** (les tâches restent visibles seulement en résumé sur Accueil; écran dédié `taches` toujours un stub).
+- liste personnelle de tâches — construite (`TasksScreen.tsx`, filtres À faire/En retard/Terminées/Toutes, création, bascule fait/à faire).
 
-> Note (2026-09-12) : écran Contacts construit (`ContactsScreen.tsx`/`ContactDrawer.tsx`/`NewContactModal.tsx`, hook `useContacts.ts`) — table `contacts` déjà en place depuis Phase 3, seule la vue manquait. Tâches et Fichiers restent des stubs (`StubScreen.tsx`).
+> Note (2026-09-12) : écrans Contacts (`ContactsScreen.tsx`/`ContactDrawer.tsx`/`NewContactModal.tsx`, hook `useContacts.ts`) et Tâches (`TasksScreen.tsx`/`NewTaskModal.tsx`, réutilise `AppContext` puisque les tâches faisaient déjà partie du `CrmBundle`) construits — tables `contacts`/`tasks` déjà en place depuis Phase 3, seules les vues manquaient. Fichiers reste un stub (`StubScreen.tsx`).
 
 ## Règles
 

@@ -69,6 +69,13 @@ export interface NewContactInput {
   phone?: string;
 }
 
+export interface NewTaskInput {
+  label: string;
+  description?: string;
+  dueDate?: string;
+  urgent?: boolean;
+}
+
 export interface ContactDetail extends Contact {
   opportunities: Prospect[];
   activities: ActivityItem[];

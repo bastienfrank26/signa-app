@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { CrmRepository } from '../../application/CrmRepository';
-import type { ActivityItem, Contact, ContactDetail, CrmBundle, NewContactInput, NewProspectInput, Prospect, Stage, Task } from '../../domain/crm';
+import type { ActivityItem, Contact, ContactDetail, CrmBundle, NewContactInput, NewProspectInput, NewTaskInput, Prospect, Stage, Task } from '../../domain/crm';
 
 function mapStage(row: Record<string, unknown>): Stage {
   return {
@@ -164,6 +164,19 @@ export function createSupabaseCrmRepository(client: SupabaseClient): CrmReposito
     async toggleTask(taskId, done) {
       const { error } = await client.from('tasks').update({ done }).eq('id', taskId);
       if (error) throw new Error('La tâche n’a pas pu être mise à jour.');
+    },
+
+    async createTask(organizationId, input: NewTaskInput) {
+      const { data: userData } = await client.auth.getUser();
+      const { error } = await client.from('tasks').insert({
+        organization_id: organizationId,
+        assignee_id: userData.user?.id ?? null,
+        label: input.label,
+        description: input.description || null,
+        due_date: input.dueDate || null,
+        urgent: input.urgent ?? false,
+      });
+      if (error) throw new Error('La tâche n’a pas pu être créée.');
     },
 
     async listContacts(organizationId) {
