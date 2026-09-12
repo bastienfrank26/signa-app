@@ -40,6 +40,15 @@
 - `presentation/useProjectBundle.ts` — hook de chargement/rechargement
 - `presentation/ProjectDashboardPage.tsx` — page réelle branchée sur l'écran "Suivi du projet" (`App.tsx`, remplace le stub)
 
+## `src/features/admin/` (Phase 2)
+
+- `domain/admin.ts` — `StaffRole`, `OrganizationSummary`, `OrganizationDetail`, `AuditEvent`
+- `application/AdminRepository.ts` — interface (port)
+- `infrastructure/supabase/SupabaseAdminRepository.ts` — liste/détail organisations, RPC admin (statuts, étapes, memberships), audit
+- `presentation/useStaffRole.ts` — hook + instance partagée du repository (`adminRepository`)
+- `presentation/RequireStaff.tsx` — garde de route (affiche "Accès refusé" si non-personnel)
+- `presentation/AdminLayout.tsx`, `OrganizationsListPage.tsx`, `OrganizationDetailPage.tsx`, `AuditLogPage.tsx`, `ReasonDialog.tsx` (motif obligatoire réutilisable)
+
 ## `src/components/` (prototype visuel CRM — Phase 3 les branchera à Supabase, sans refonte)
 
 - `Sidebar.tsx`, `Header.tsx` — layout bureau
@@ -67,6 +76,9 @@
 - `migrations/20260912123000_organizations_created_by.sql` — correctif RLS (colonne `created_by`)
 - `migrations/20260912140000_portal_web_projects.sql` — web_projects, project_steps, project_files, revision_requests, approvals, RLS, auto-création du projet à la création d'une organisation
 - `migrations/20260912141500_portal_approval_and_storage.sql` — RPC `approve_project_version`, bucket Storage `project-files` + RLS storage.objects
+- `migrations/20260912150000_admin_internal_staff.sql` — `internal_staff`, `audit_events`, `organizations.status`, policies staff (lecture cross-org) et garde de suspension sur les écritures client
+- `migrations/20260912151500_admin_actions.sql` — RPC admin (`admin_set_organization_status`, `admin_set_project_status`, `admin_set_step_status`, `admin_update_membership`), motif obligatoire + audit
+- `migrations/20260912152000_admin_membership_emails.sql` — RPC `admin_organization_memberships` (courriels des membres pour le personnel Signa)
 
 ## Infrastructure (hors dépôt Git)
 

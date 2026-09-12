@@ -33,7 +33,20 @@
 - [x] `features/portal` : `ProjectDashboardPage` (progression, version privée + approbation, fichiers, corrections, historique), branchée sur l'écran "Suivi du projet" du prototype existant
 - [x] Vérifié par script (isolation RLS tables + storage entre 2 organisations) et en vrai navigateur (Playwright, production) : demande de correction, téléversement de fichier, passage en révision privée (simulé côté Signa via service role), approbation réelle confirmée en base
 
-## À faire (avant Phase 2)
+## Terminées (Phase 2) — 2026-09-12
+
+- [x] Table `internal_staff` (rôles support/operations/billing_admin/super_admin), distincte des memberships clients — `is_internal_staff()`, `is_internal_admin()` (operations+super_admin seulement), `current_staff_role()`
+- [x] Table `audit_events` : toute action admin sensible écrit un motif obligatoire (suspension, changement de statut projet, changement d'accès) via des RPC dédiées (`admin_set_organization_status`, `admin_set_project_status`, `admin_set_step_status`, `admin_update_membership`) — jamais d'écriture directe côté client
+- [x] `organizations.status` (active/suspended) : suspension réduit l'accès (écriture bloquée sur revision_requests/project_files/approbation) sans effacer les données, testé
+- [x] RPC `admin_organization_memberships` : seul moyen pour le personnel Signa de voir les courriels des membres (auth.users non exposé au client)
+- [x] `features/admin` : console séparée (`/admin/organisations`, `/admin/organisations/:id`, `/admin/audit`), gardée par `RequireStaff` — un client normal qui y va voit "Accès refusé"
+- [x] Vérifié par script (isolation cross-org, garde-fous de rôle, blocage/déblocage d'accès, audit) et en navigateur réel (Playwright, production) : suspension, réactivation, changement de statut de projet, étape marquée terminée, tout confirmé en base
+
+## À faire (avant Phase 3)
+
+- [ ] Console admin ne permet pas encore de créer une organisation pour un client (le flux MVP réel : "Signa crée le compte après paiement", avec invitation) — reporté, dépend de la table `invitations` (existe depuis Phase 0, jamais utilisée) et d'un flux de rédemption côté client, non construits
+- [ ] Sections Modules/Sites/Abonnements de l'administration pas construites — aucune table ne les supporte encore (Phase 3/4/5)
+- [ ] Un membre du personnel Signa sans organisation qui visite `/` (au lieu de `/admin/...`) tombe sur l'écran de création d'organisation du client — angle mort mineur, pas bloquant (le personnel utilise `/admin/organisations` directement)
 
 - [ ] Décider si l'inscription libre (`/inscription`) reste ouverte au public ou si elle doit être retirée avant le pilote (le MVP prévoit que Signa crée les comptes après paiement, pas un self-signup)
 - [ ] Configurer un vrai fournisseur SMTP (Resend, comme `reca-app-v3`) dans Supabase Auth — le SMTP par défaut limite l'envoi de courriels de confirmation/réinitialisation à quelques par heure

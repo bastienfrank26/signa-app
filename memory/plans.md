@@ -6,7 +6,7 @@ Plan de développement complet : voir `/root/.claude/plans/mellow-toasting-dahl.
 
 - [x] Phase 0 — Fondation technique : Supabase, `organizations`/`memberships`/`invitations`, `features/auth`, react-router-dom, autorisation serveur (terminée 2026-09-12, détail dans `tasks.md`)
 - [x] Phase 1 — Portail client : projets web, étapes, fichiers, corrections, approbations (terminée 2026-09-12, détail dans `tasks.md`; notifications essentielles reportées, voir tasks.md)
-- [ ] Phase 2 — Administration Signa : organisations, accès, modules, sites, abonnements, audit
+- [x] Phase 2 — Administration Signa : organisations, accès, projets web, audit (terminée 2026-09-12 ; modules/sites/abonnements reportés, voir tasks.md — pas de table backing avant Phase 3/4/5)
 - [ ] Phase 3 — CRM réel : brancher le prototype visuel existant (`HomeScreen`, `ProspectsScreen`, `PipelineScreen`) à Supabase
 - [ ] Phase 4 — Intégrations de sites : `siteId`, clés, soumissions idempotentes, Edge Function `site-submissions`
 - [ ] Phase 5 — Production : Stripe, MFA, Loi 25, sauvegardes, observabilité
@@ -15,4 +15,4 @@ Plan de développement complet : voir `/root/.claude/plans/mellow-toasting-dahl.
 
 ## Prochaine étape immédiate
 
-Phase 2 — Administration Signa. Voir `tasks.md` pour les zones grises laissées par la Phase 1 (transitions de statut, notifications) qu'une vraie console admin devra combler.
+Phase 3 — CRM réel (brancher le prototype visuel existant à Supabase). Voir `tasks.md` pour ce que la Phase 2 laisse ouvert (création d'organisation par Signa avec invitation, modules/sites/abonnements).
