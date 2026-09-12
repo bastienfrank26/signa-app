@@ -103,9 +103,17 @@
 - [x] `AppContext` : `reload` exposé dans les actions (au lieu d'ajouter encore des champs d'état pour la modale) — les tâches faisaient déjà partie du `CrmBundle`, contrairement aux contacts qui ont leur propre hook
 - [x] Vérifié avec Playwright (compte de test) : création, filtres, badge Sidebar, accès mobile — zéro erreur console
 
-## Reste du module CRM (Fichiers)
+## Terminées (écran Fichiers du portail, pas du CRM) — 2026-09-12
 
-- [ ] Fichiers CRM (`fichiers`, toujours stub) — **aucune table** pour ça (contrairement à Contacts/Tâches, maintenant construits) ; `project_files` existe mais sert le portail client, pas le CRM. Nécessite migration (table + policies RLS + bucket Storage) avant l'écran
+- [x] **Clarifié avec Francis** : le nav « Fichiers » (MON SITE) n'est pas un module CRM — c'est `project_files` (portail client, doc 05), qui avait déjà upload mais aucun téléchargement. Construit `FilesScreen.tsx` (liste, catégorie, taille, date, téléchargement) — remplace le stub
+- [x] Vrai trou trouvé et corrigé au passage : aucune fonction de téléchargement n'existait nulle part (bucket `project-files` privé, jamais de `createSignedUrl`). Ajouté `ProjectRepository.getFileUrl` + bouton Télécharger aussi dans `ProjectDashboardPage.tsx` (section Fichiers du Suivi du projet), pas seulement le nouvel écran dédié — les deux existent volontairement en double (choix de Francis), mais aucun des deux ne pouvait télécharger avant
+- [x] `ProjectFile` (domain) expose maintenant `mimeType`/`sizeBytes` (déjà en base, jamais mappés)
+- [x] Vérifié avec Playwright (compte de test) : upload + téléchargement réel (URL signée Supabase Storage) — zéro erreur console
+- [x] `StubScreen.tsx` simplifié en filet de sécurité générique — tous les écrans de `Screen` sont maintenant construits (Contacts, Tâches, Fichiers)
+
+## Reste du module CRM (fichiers attachés à un contact)
+
+- [ ] Fichiers attachés à une fiche contact (doc 06, différent de l'écran Fichiers ci-dessus) — **aucune table** pour ça. Nécessite migration (table + policies RLS + bucket Storage), patron déjà établi par `project_files`/`project-files`
 - [ ] Pas d'UI d'assignation de tâche à un autre membre de l'équipe (assignée au créateur seulement pour l'instant) — à ajouter si le besoin se confirme
 
 ## Terminées (branche `design/mobile-nav`, hors phases) — 2026-09-12

@@ -31,6 +31,7 @@
 - `presentation/useContacts.ts` — hook de chargement/rechargement des contacts (patron `useProjectBundle.ts`)
 - `src/components/ContactsScreen.tsx`, `ContactDrawer.tsx`, `NewContactModal.tsx` — écran Contacts (liste, fiche, création)
 - `src/components/TasksScreen.tsx`, `NewTaskModal.tsx` — écran Tâches (filtres, création), lit `AppContext` directement (tâches déjà dans `CrmBundle`)
+- `src/components/FilesScreen.tsx` — écran Fichiers du portail (upload, liste, téléchargement), utilise `useProjectBundle`/`ProjectRepository` — **pas du CRM**, voir note dans doc 06
 
 ## `src/features/auth/` (Phase 0)
 

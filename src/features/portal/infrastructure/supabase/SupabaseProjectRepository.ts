@@ -36,6 +36,8 @@ function mapFile(row: Record<string, unknown>): ProjectFile {
     fileName: row.file_name as string,
     storagePath: row.storage_path as string,
     category: row.category as ProjectFile['category'],
+    mimeType: (row.mime_type as string | null) ?? null,
+    sizeBytes: (row.size_bytes as number | null) ?? null,
     createdAt: row.created_at as string,
   };
 }
@@ -129,6 +131,12 @@ export function createSupabaseProjectRepository(client: SupabaseClient): Project
         category: 'other',
       });
       if (rowError) throw new Error('Le fichier a été téléversé, mais son enregistrement a échoué.');
+    },
+
+    async getFileUrl(storagePath) {
+      const { data, error } = await client.storage.from('project-files').createSignedUrl(storagePath, 60);
+      if (error || !data) throw new Error('Le lien de téléchargement n’a pas pu être créé.');
+      return data.signedUrl;
     },
   };
 }

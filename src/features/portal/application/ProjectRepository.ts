@@ -11,4 +11,5 @@ export interface ProjectRepository {
   submitRevisionRequest: (webProjectId: string, request: NewRevisionRequest) => Promise<void>;
   approveVersion: (webProjectId: string, versionLabel: string, consentText: string) => Promise<void>;
   uploadFile: (organizationId: string, webProjectId: string, file: File) => Promise<void>;
+  getFileUrl: (storagePath: string) => Promise<string>;
 }

@@ -45,7 +45,7 @@ Les doublons sont signalés sans fusion destructive automatique — non impléme
 - aperçu avec nouveaux prospects, valeur et suivis en retard;
 - liste filtrable;
 - pipeline adapté au mobile;
-- fiche avec coordonnées, occasions, activités et fichiers — **fichiers non construits** (aucune table CRM pour ça, contrairement aux coordonnées/occasions/activités, construites le 2026-09-12);
+- fiche avec coordonnées, occasions, activités et fichiers — **fichiers attachés à un contact non construits** (aucune table CRM pour ça, contrairement aux coordonnées/occasions/activités, construites le 2026-09-12). Ne pas confondre avec l'écran « Fichiers » du menu MON SITE : celui-là concerne les fichiers du projet web (`project_files`, doc 05), construit le 2026-09-12, pas du CRM;
 - liste personnelle de tâches — construite (`TasksScreen.tsx`, filtres À faire/En retard/Terminées/Toutes, création, bascule fait/à faire).
 
 > Note (2026-09-12) : écrans Contacts (`ContactsScreen.tsx`/`ContactDrawer.tsx`/`NewContactModal.tsx`, hook `useContacts.ts`) et Tâches (`TasksScreen.tsx`/`NewTaskModal.tsx`, réutilise `AppContext` puisque les tâches faisaient déjà partie du `CrmBundle`) construits — tables `contacts`/`tasks` déjà en place depuis Phase 3, seules les vues manquaient. Fichiers reste un stub (`StubScreen.tsx`).

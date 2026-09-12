@@ -103,6 +103,7 @@ export default function ProjectDashboardPage() {
   const [approveError, setApproveError] = useState<string | null>(null);
   const [approving, setApproving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
   if (loading) return <div style={{ padding: 24, color: 'var(--sg-text-muted)' }}>Chargement du projet…</div>;
   if (error) return <div style={{ padding: 24, color: 'var(--sg-danger)' }}>{error}</div>;
@@ -134,6 +135,16 @@ export default function ProjectDashboardPage() {
     } finally {
       setUploading(false);
       e.target.value = '';
+    }
+  }
+
+  async function handleDownload(fileId: string, storagePath: string) {
+    setDownloadingId(fileId);
+    try {
+      const url = await repository.getFileUrl(storagePath);
+      window.open(url, '_blank', 'noopener');
+    } finally {
+      setDownloadingId(null);
     }
   }
 
@@ -192,9 +203,18 @@ export default function ProjectDashboardPage() {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {files.map((f) => (
-              <div key={f.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #F1EDE5', fontSize: 13.5 }}>
-                <span>{f.fileName}</span>
-                <span style={{ color: 'var(--sg-text-muted)', fontSize: 12 }}>{new Date(f.createdAt).toLocaleDateString('fr-CA')}</span>
+              <div key={f.id} style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #F1EDE5', fontSize: 13.5 }}>
+                <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.fileName}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 'none' }}>
+                  <span style={{ color: 'var(--sg-text-muted)', fontSize: 12 }}>{new Date(f.createdAt).toLocaleDateString('fr-CA')}</span>
+                  <button
+                    onClick={() => void handleDownload(f.id, f.storagePath)}
+                    disabled={downloadingId === f.id}
+                    style={{ minHeight: 32, padding: '0 12px', borderRadius: 8, border: '1px solid var(--sg-border-strong)', background: '#fff', fontSize: 12.5, fontWeight: 700, cursor: downloadingId === f.id ? 'not-allowed' : 'pointer' }}
+                  >
+                    {downloadingId === f.id ? 'Ouverture…' : 'Télécharger'}
+                  </button>
+                </div>
               </div>
             ))}
           </div>

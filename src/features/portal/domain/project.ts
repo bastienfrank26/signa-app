@@ -46,6 +46,8 @@ export interface ProjectFile {
   fileName: string;
   storagePath: string;
   category: 'logo' | 'photo' | 'text' | 'other';
+  mimeType: string | null;
+  sizeBytes: number | null;
   createdAt: string;
 }
 
