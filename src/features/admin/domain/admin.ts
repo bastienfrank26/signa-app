@@ -41,6 +41,17 @@ export interface OrganizationDetail {
   steps: ProjectStepRow[];
 }
 
+export const siteStatuses = ['active', 'suspended', 'revoked'] as const;
+export type SiteStatus = (typeof siteStatuses)[number];
+
+export interface Site {
+  id: string;
+  name: string;
+  status: SiteStatus;
+  allowedOrigins: string[];
+  keyPrefix: string | null;
+}
+
 export interface AuditEvent {
   id: string;
   actorUserId: string | null;

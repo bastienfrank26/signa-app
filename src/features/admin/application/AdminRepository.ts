@@ -1,6 +1,11 @@
-import type { AuditEvent, OrganizationDetail, OrganizationSummary } from '../domain/admin';
+import type { AuditEvent, OrganizationDetail, OrganizationSummary, Site } from '../domain/admin';
 
 export interface AdminRepository {
+  listSites: (organizationId: string) => Promise<Site[]>;
+  createSite: (organizationId: string, name: string, allowedOrigins: string[]) => Promise<{ siteId: string; secret: string }>;
+  rotateSiteKey: (siteId: string) => Promise<{ secret: string }>;
+  setSiteStatus: (siteId: string, status: 'active' | 'suspended' | 'revoked', reason: string) => Promise<void>;
+  testSiteIntegration: (siteId: string) => Promise<{ submissionId: string }>;
   getStaffRole: () => Promise<string | null>;
   listOrganizations: () => Promise<OrganizationSummary[]>;
   getOrganizationDetail: (organizationId: string) => Promise<OrganizationDetail | null>;

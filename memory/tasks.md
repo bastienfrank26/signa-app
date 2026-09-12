@@ -58,7 +58,25 @@
 - Les couleurs d'étape de pipeline sont codées en front (`features/crm/domain/stageColors.ts`, par `stage_key`), pas en base — un pipeline renommé/réordonné reste fonctionnel mais une étape avec une clé inconnue retombe sur une couleur neutre.
 - `useProjectBundle` est appelé indépendamment à plusieurs endroits d'un même écran (accueil) — plusieurs requêtes réseau redondantes. Fonctionnel, mais un cache partagé (ex. React Query) serait plus efficace si l'app grossit.
 
-## À faire (avant Phase 4)
+## Terminées (Phase 4) — 2026-09-12
+
+- [x] Migrations `sites`/`api_keys`/`form_submissions` — exclusifs au personnel Signa (aucune policy client, ni lecture ni écriture)
+- [x] RPC admin : `admin_create_site` (génère et hache la clé, secret retourné une seule fois), `admin_rotate_site_key`, `admin_set_site_status`, `admin_list_sites`
+- [x] RPC `capture_site_submission_v1` : idempotence par `(site_id, idempotency_key)`, limite de débit (20/minute/site), création contact+opportunité+activité dans le pipeline par défaut de l'organisation
+- [x] Edge Function `site-submissions` (`supabase/functions/site-submissions`, `--no-verify-jwt`) : authentification par clé de site hachée (`x-signa-site-key`), CORS par origine déclarée par site, champ piège anti-robot, limite de taille (16 Ko), consentement `privacy` obligatoire
+- [x] Section "Sites" dans la fiche d'organisation de l'administration : création, affichage unique du secret + extrait d'intégration prêt à copier, rotation de clé, suspension/réactivation/révocation (motif obligatoire, audité)
+- [x] **Faille de sécurité trouvée et corrigée en cours de route** : `capture_site_submission_v1` en `security definer` sans révocation explicite des privilèges par défaut de Supabase (`anon`/`authenticated` ont EXECUTE par défaut sur les nouvelles fonctions, indépendamment de PUBLIC) permettait à n'importe quel utilisateur authentifié de créer des prospects dans n'importe quelle organisation sans la clé de site. Corrigé par `revoke execute ... from anon, authenticated` explicite + vérifié par test d'intrusion (voir note ci-dessous)
+- [x] Vérifié par script (idempotence, piège anti-robot, CORS bonne/mauvaise origine incluant le préflight, révocation de site, isolation) et en navigateur réel (Playwright, production) : création de site, secret affiché une fois, test d'intégration, apparition dans le CRM du client
+
+## Note de sécurité pour les prochaines phases
+
+**Toute nouvelle fonction Postgres qui insère/modifie des données sans vérifier explicitement l'autorisation dans son propre corps doit révoquer EXECUTE de `anon` ET `authenticated` explicitement** (pas seulement `PUBLIC` — Supabase accorde EXECUTE à ces deux rôles par défaut à la création, indépendamment de PUBLIC). Vérifier avec un test d'intrusion (utilisateur authentifié quelconque qui tente l'appel direct) avant de considérer une fonction sensible comme terminée. Toutes les fonctions existantes ont été auditées le 2026-09-12 ; seule `capture_site_submission_v1` avait ce problème.
+
+## À faire (avant Phase 5)
+
+- [ ] Webhooks sortants (table `webhook_deliveries`) non construits — reportés jusqu'à l'apparition d'un vrai besoin (aucun consommateur externe pour l'instant ; Stripe en Phase 5 est un webhook *entrant*, pas concerné)
+- [ ] Détection de doublons de contacts (doc 06 : "signalés sans fusion destructive automatique") non implémentée — chaque soumission crée un nouveau contact, même si l'adresse courriel existe déjà
+- [ ] Notifications (table dédiée) pas construites — une activité CRM sert d'équivalent visible pour l'instant, pas de courriel envoyé au client à la réception d'un prospect
 
 - [ ] Console admin ne permet pas encore de créer une organisation pour un client (le flux MVP réel : "Signa crée le compte après paiement", avec invitation) — reporté, dépend de la table `invitations` (existe depuis Phase 0, jamais utilisée) et d'un flux de rédemption côté client, non construits
 - [ ] Sections Modules/Sites/Abonnements de l'administration pas construites — aucune table ne les supporte encore (Phase 3/4/5)

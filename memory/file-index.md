@@ -47,7 +47,7 @@
 - `infrastructure/supabase/SupabaseAdminRepository.ts` — liste/détail organisations, RPC admin (statuts, étapes, memberships), audit
 - `presentation/useStaffRole.ts` — hook + instance partagée du repository (`adminRepository`)
 - `presentation/RequireStaff.tsx` — garde de route (affiche "Accès refusé" si non-personnel)
-- `presentation/AdminLayout.tsx`, `OrganizationsListPage.tsx`, `OrganizationDetailPage.tsx`, `AuditLogPage.tsx`, `ReasonDialog.tsx` (motif obligatoire réutilisable)
+- `presentation/AdminLayout.tsx`, `OrganizationsListPage.tsx`, `OrganizationDetailPage.tsx`, `AuditLogPage.tsx`, `ReasonDialog.tsx` (motif obligatoire réutilisable), `SitesSection.tsx` (Phase 4 : création/rotation/statut de site, secret affiché une fois)
 
 ## `src/features/crm/` (Phase 3)
 
@@ -89,6 +89,14 @@
 - `migrations/20260912151500_admin_actions.sql` — RPC admin (`admin_set_organization_status`, `admin_set_project_status`, `admin_set_step_status`, `admin_update_membership`), motif obligatoire + audit
 - `migrations/20260912152000_admin_membership_emails.sql` — RPC `admin_organization_memberships` (courriels des membres pour le personnel Signa)
 - `migrations/20260912160000_crm_core.sql` — pipelines, pipeline_stages, contacts, opportunities, activities, tasks, RLS (`is_org_writer` bloque le rôle readonly), pipeline par défaut auto-créé, activité automatique gagné/perdu
+- `migrations/20260912170000_site_integrations.sql` — sites, api_keys, form_submissions (staff seulement), RPC admin (create/rotate/status/list), `capture_site_submission_v1`
+- `migrations/20260912171500_site_integrations_write_policies.sql` — correctif RLS (policies INSERT/UPDATE manquantes sur sites/api_keys)
+- `migrations/20260912172000_site_test_integration.sql` — `capture_site_submission_v1` en security definer, `admin_test_site_integration` (bouton de test admin, sans CORS)
+- `migrations/20260912172500_fix_capture_function_privileges.sql` — **correctif de sécurité** : révoque EXECUTE de `anon`/`authenticated` sur `capture_site_submission_v1` (voir note de sécurité dans tasks.md)
+
+## `supabase/functions/`
+
+- `site-submissions/` (Phase 4) — Edge Function publique, `POST /site-submissions/{siteId}`, auth par clé de site hachée (`x-signa-site-key`), CORS par origine déclarée, déployée avec `--no-verify-jwt`
 
 ## Infrastructure (hors dépôt Git)
 

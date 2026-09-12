@@ -1,9 +1,50 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { AdminRepository } from '../../application/AdminRepository';
-import type { AuditEvent, OrganizationDetail, OrganizationSummary } from '../../domain/admin';
+import type { AuditEvent, OrganizationDetail, OrganizationSummary, Site } from '../../domain/admin';
 
 export function createSupabaseAdminRepository(client: SupabaseClient): AdminRepository {
   return {
+    async listSites(organizationId) {
+      const { data, error } = await client.rpc('admin_list_sites', { p_org_id: organizationId });
+      if (error) throw new Error('Les sites n’ont pas pu être chargés.');
+      return ((data as unknown[]) ?? []).map((row) => {
+        const r = row as Record<string, unknown>;
+        return {
+          id: r.id as string,
+          name: r.name as string,
+          status: r.status as Site['status'],
+          allowedOrigins: (r.allowedOrigins as string[]) ?? [],
+          keyPrefix: (r.keyPrefix as string | null) ?? null,
+        };
+      });
+    },
+
+    async createSite(organizationId, name, allowedOrigins) {
+      const { data, error } = await client.rpc('admin_create_site', {
+        p_org_id: organizationId,
+        p_name: name,
+        p_allowed_origins: allowedOrigins,
+      });
+      if (error) throw new Error(error.message);
+      return { siteId: data.siteId as string, secret: data.secret as string };
+    },
+
+    async rotateSiteKey(siteId) {
+      const { data, error } = await client.rpc('admin_rotate_site_key', { p_site_id: siteId });
+      if (error) throw new Error(error.message);
+      return { secret: data.secret as string };
+    },
+
+    async setSiteStatus(siteId, status, reason) {
+      const { error } = await client.rpc('admin_set_site_status', { p_site_id: siteId, p_status: status, p_reason: reason });
+      if (error) throw new Error(error.message);
+    },
+
+    async testSiteIntegration(siteId) {
+      const { data, error } = await client.rpc('admin_test_site_integration', { p_site_id: siteId });
+      if (error) throw new Error(error.message);
+      return { submissionId: data.submissionId as string };
+    },
     async getStaffRole() {
       const { data } = await client.rpc('current_staff_role');
       return (data as string | null) ?? null;

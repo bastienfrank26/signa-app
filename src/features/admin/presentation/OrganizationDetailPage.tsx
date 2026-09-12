@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import AdminLayout from './AdminLayout';
 import ReasonDialog from './ReasonDialog';
+import SitesSection from './SitesSection';
 import { adminRepository } from './useStaffRole';
 import type { OrganizationDetail } from '../domain/admin';
 import { projectStatuses, projectStatusLabels } from '../../portal/domain/project';
@@ -118,6 +119,8 @@ export default function OrganizationDetailPage() {
             </div>
           </section>
         )}
+
+        <SitesSection organizationId={detail.id} />
       </div>
 
       {dialog?.kind === 'suspend' && (
