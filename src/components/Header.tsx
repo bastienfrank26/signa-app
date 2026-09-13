@@ -41,7 +41,7 @@ export default function Header() {
           fontSize: 13,
         }}
       >
-        <span style={{ fontSize: 13 }}>⌕</span> Rechercher un contact, une tâche, un fichier…
+        <span style={{ fontSize: 13 }}>⌕</span> Rechercher…
       </div>
       <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 14 }}>
         <div className="sg-header-desktop-only" style={{ alignItems: 'center', gap: 9 }}>

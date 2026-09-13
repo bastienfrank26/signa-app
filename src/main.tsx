@@ -16,6 +16,9 @@ import OrganizationsListPage from './features/admin/presentation/OrganizationsLi
 import OrganizationDetailPage from './features/admin/presentation/OrganizationDetailPage';
 import AuditLogPage from './features/admin/presentation/AuditLogPage';
 import PilotMetricsPage from './features/admin/presentation/PilotMetricsPage';
+import PortalShell from './features/portal/presentation/PortalShell';
+import PortalDashboardPage from './features/portal/presentation/PortalDashboardPage';
+import AppLauncherPage from './features/launcher/presentation/AppLauncherPage';
 import './styles/global.css';
 
 createRoot(document.getElementById('root')!).render(
@@ -39,7 +42,11 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/admin/indicateurs" element={<PilotMetricsPage />} />
             </Route>
             <Route element={<RequireOrganization />}>
-              <Route path="/*" element={<CrmPrototype />} />
+              <Route path="/crm/*" element={<CrmPrototype />} />
+              <Route element={<PortalShell />}>
+                <Route path="/" element={<PortalDashboardPage />} />
+                <Route path="/applications" element={<AppLauncherPage />} />
+              </Route>
             </Route>
           </Route>
         </Routes>
