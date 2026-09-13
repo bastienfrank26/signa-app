@@ -17,7 +17,7 @@ Le portail est le premier accès après le paiement. Il remplace les échanges d
 | Approbation | Approuve officiellement | Verrouille la version | Autorisation datée |
 | Mise en ligne | Reçoit la confirmation | Publie et configure | Site actif |
 
-> Note (2026-09-12) : la création automatique du compte à la création d'une organisation (via inscription libre, Phase 0) remplace temporairement « Signa crée le compte et le projet ». Le vrai déclenchement par paiement (Stripe) existe depuis la Phase 5, mais la création d'organisation reste self-service — voir `memory/tasks.md`.
+> Note (2026-09-13, remplace la note du 2026-09-12) : « Signa crée le compte » est maintenant réel — l'inscription libre a été retirée (DEC-020). Le personnel Signa crée l'organisation et une invitation depuis l'admin, le client rachète cette invitation. Ce qui manque encore : le déclenchement automatique par le paiement Stripe (aujourd'hui, création d'organisation et lien de paiement restent deux actions manuelles distinctes du personnel) et l'application réelle de `is_org_billing_active()` comme porte d'accès — voir `memory/tasks.md`.
 
 ## États
 

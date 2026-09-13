@@ -1,5 +1,14 @@
 # Tâches atomiques
 
+## Terminées (DEC-020, onboarding) — 2026-09-13
+
+- [x] Inscription libre retirée : `organizations_insert_authenticated` (n'importe quel authentifié) remplacée par `organizations_insert_staff_admin` (`is_internal_admin()` seulement) — migration `20260913000000_remove_self_signup_org_creation.sql`
+- [x] `CreateOrganizationPage.tsx` renommé `NoOrganizationPage.tsx` : n'offre plus de créer sa propre organisation, affiche « aucun accès, contactez Signa » (sauf redirection staff déjà en place vers `/admin`)
+- [x] Code mort retiré : `OrganizationRepository.create`, `SupabaseOrganizationRepository.create`, `domain/organization.ts` (plus aucun appelant)
+- [x] Vérifié : policy DB confirmée par requête directe (une seule policy INSERT, staff seulement) ; non-régression testée (staff crée toujours un client via `CreateClientModal` sans erreur)
+- [ ] `/inscription` (`SignUpPage`) reste public — nécessaire pour qu'un invité sans compte puisse s'en créer un avant de racheter son invitation ; à revoir si ça devient un vecteur d'abus (compte créé sans jamais être invité, juste bloqué sur `NoOrganizationPage`, sans conséquence réelle actuellement)
+- [ ] Paiement toujours pas branché à la création d'organisation (deux actions manuelles distinctes du staff) ; `is_org_billing_active()` toujours pas appliqué comme porte d'accès — DEC-003 pas encore pleinement réalisée, voir `docs/05-PORTAIL-CLIENT.md`
+
 ## Documentation CRM enrichie par Francis — 2026-09-13
 
 `docs/01-PERIMETRE-ET-MVP.md`, `03-MODELE-DE-DONNEES.md`, `06-MODULE-CRM.md`, `07-INTEGRATION-DES-SITES.md` remplacés par les versions fournies dans `.input/docs-need-to-update/` (gitignored, pas dans le dépôt). Specs beaucoup plus détaillées qu'avant, pas juste des ajustements — introduisent des besoins réels **pas encore construits** :

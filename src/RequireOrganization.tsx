@@ -2,7 +2,7 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from './features/auth/presentation/useAuth';
 import { useStaffRole } from './features/admin/presentation/useStaffRole';
 import { AuthLoadingState } from './features/auth/presentation/guards';
-import CreateOrganizationPage from './features/organizations/presentation/CreateOrganizationPage';
+import NoOrganizationPage from './features/organizations/presentation/NoOrganizationPage';
 
 export default function RequireOrganization() {
   const { session } = useAuth();
@@ -13,7 +13,7 @@ export default function RequireOrganization() {
     // création d'entreprise ne s'applique qu'aux clients.
     if (loading) return <AuthLoadingState />;
     if (role) return <Navigate to="/admin/organisations" replace />;
-    return <CreateOrganizationPage />;
+    return <NoOrganizationPage />;
   }
   return <Outlet />;
 }
