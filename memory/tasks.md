@@ -172,7 +172,7 @@ Le pilote (3 à 5 vraies entreprises, doc 13-ROADMAP) est une activité commerci
 
 - [ ] Console admin ne permet pas encore de créer une organisation pour un client (le flux MVP réel : "Signa crée le compte après paiement", avec invitation) — reporté, dépend de la table `invitations` (existe depuis Phase 0, jamais utilisée) et d'un flux de rédemption côté client, non construits
 - [ ] Sections Modules/Sites/Abonnements de l'administration pas construites — aucune table ne les supporte encore (Phase 3/4/5)
-- [ ] Un membre du personnel Signa sans organisation qui visite `/` (au lieu de `/admin/...`) tombe sur l'écran de création d'organisation du client — angle mort mineur, pas bloquant (le personnel utilise `/admin/organisations` directement)
+- [x] ~~Un membre du personnel Signa sans organisation qui visite `/` (au lieu de `/admin/...`) tombe sur l'écran de création d'organisation du client~~ — **corrigé le 2026-09-13** : trouvé par Francis en testant le nouveau compte staff (`admin@signaweb.ca`) ; `RequireOrganization.tsx` redirige maintenant vers `/admin/organisations` quand l'utilisateur sans organisation a un rôle staff (`useStaffRole`)
 
 - [ ] Décider si l'inscription libre (`/inscription`) reste ouverte au public ou si elle doit être retirée avant le pilote (le MVP prévoit que Signa crée les comptes après paiement, pas un self-signup)
 - [ ] Configurer un vrai fournisseur SMTP (Resend, comme `reca-app-v3`) dans Supabase Auth — le SMTP par défaut limite l'envoi de courriels de confirmation/réinitialisation à quelques par heure
