@@ -1,5 +1,15 @@
 # Tâches atomiques
 
+## Terminées (portail client neutre, Phase 3 signa-docs — pas les "Phase N" locales ci-dessous) — 2026-09-13
+
+- [x] Nouveau shell `PortalShell`/`PortalSidebar` (découplé de `AppContext`/`AppProvider`) : route racine `/` = tableau de bord portail, plus le CRM
+- [x] CRM déplacé sous `/crm/*` (toujours fonctionnel tel quel, juste plus la route par défaut)
+- [x] `PortalDashboardPage` = résumé applications + `ProjectDashboardPage` existant (suivi de projet)
+- [x] `AppLauncher`/`AppLauncherPage` (`/applications`) : premier appel réel signa-app → signa-core (`GET /api/v1/modules`), statut d'accès réel par module (pas deviné côté front)
+- [x] Vérifié en local et en prod (Playwright) : connexion → portail (pas CRM), `/applications` affiche le catalogue avec statut réel, `/crm` toujours accessible, zéro erreur console
+- [ ] Pas construit dans cette passe : facturation client réelle (Stripe customer portal), notifications, support — restent des tuiles/pages absentes ou à construire plus tard, pas dans le scope de "sortir le CRM du shell par défaut"
+- [ ] App Launcher : seul `crm` a une route interne câblée (`/crm`) ; les autres modules "inclus" n'ont pas encore de destination réelle (pas d'app séparée déployée) — normal, aucun autre module Signa n'existe encore comme app
+
 ## Terminées (navigation mobile de l'admin) — 2026-09-13
 
 - [x] Admin (`AdminLayout.tsx`) était 100 % bureau depuis sa construction (Phase 2), jugé acceptable jusqu'ici — Francis l'a demandé quand même. Réutilise le patron exact du shell client (`MobileNav.tsx`/`MobileMoreSheet.tsx`) : `AdminMobileNav.tsx` (barre d'onglets fixe : Organisations/Audit/Indicateurs/Plus) + `AdminMoreSheet.tsx` (courriel, rôle, lien Espace client, Déconnexion)
