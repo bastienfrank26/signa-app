@@ -1,5 +1,22 @@
 # Tâches atomiques
 
+## Documentation CRM enrichie par Francis — 2026-09-13
+
+`docs/01-PERIMETRE-ET-MVP.md`, `03-MODELE-DE-DONNEES.md`, `06-MODULE-CRM.md`, `07-INTEGRATION-DES-SITES.md` remplacés par les versions fournies dans `.input/docs-need-to-update/` (gitignored, pas dans le dépôt). Specs beaucoup plus détaillées qu'avant, pas juste des ajustements — introduisent des besoins réels **pas encore construits** :
+
+- [ ] Contact : séparer `first_name`/`last_name` (actuellement un seul `name`), ajouter `email_normalized`/`phone_normalized` (déduplication), `lifecycle_status` (prospect/client/inactive), `owner_user_id`
+- [ ] Opportunité : `title`, `source_detail`, `site_id`, `form_key`, `landing_page`, UTM (`utm_source/medium/campaign/content/term`), `owner_user_id`, `won_at`/`lost_at` distincts
+- [ ] **Détection de doublons** (création manuelle ET soumission web) par courriel/téléphone normalisés — actuellement chaque soumission web crée toujours un nouveau contact (déjà noté comme manque avant, maintenant spécifié en détail)
+- [ ] Formulaire « + Ajouter un prospect » enrichi : courriel, téléphone, source, étape initiale, responsable, prochaine relance (actuellement juste nom/besoin/valeur)
+- [ ] Conversion prospect gagné → client (`lifecycle_status`, activité `converted_to_client`) — pas de notion de "client" actuellement, seulement des opportunités gagnées/perdues
+- [ ] Assignation d'un responsable (`owner_user_id`) sur contact/opportunité — aucune notion de responsable actuellement
+- [ ] Pipeline mobile en cartes adaptées (actuellement colonnes empilées verticalement, voir Phase mobile-nav — pas des "cartes" dédiées avec valeur/source/relance/responsable/retard)
+- [ ] Nouveau pipeline par défaut proposé (`Nouveau, À contacter, Contacté, Qualifié, Soumission, Négociation, Gagné, Perdu`) — le doc précise explicitement de ne pas casser les organisations existantes (pipeline actuel à 6 étapes) : migration additive seulement, jamais de remplacement brutal
+- [ ] `site-submissions` : payload enrichi (UTM, `idempotencyKey` explicite côté contact), déduplication par courriel/téléphone normalisés côté Edge Function
+- [ ] Tableau de bord CRM (nouveaux prospects, à contacter, retard, valeur pipeline, taux de conversion, par source, délai moyen premier suivi) — partiellement fait (Accueil), pas un vrai tableau de bord dédié
+
+Rien de tout ça n'est commencé — à prioriser avec Francis avant d'attaquer (portée large, touche le schéma `contacts`/`opportunities`, la fonction `site-submissions`, et plusieurs écrans CRM).
+
 ## Terminées
 
 - [x] Maquette visuelle CRM (React + TS) implantée depuis le design Claude Design — 2026-09-12

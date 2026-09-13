@@ -1,35 +1,94 @@
-# Intégration des sites clients
+# 07 — Intégration des sites clients
+
+Dernière mise à jour : 2026-09-12
 
 ## Objectif
 
-Francis peut fabriquer chaque site à la main, puis le connecter à `signa-app` depuis l'administration sans modifier le code de la plateforme.
+Les sites web construits par Signa doivent pouvoir transmettre automatiquement leurs demandes au CRM de la bonne organisation.
 
-## Modèle d'accès
+Le propriétaire de Signa doit pouvoir connecter un site à `signa-app` sans demander à un développeur de modifier manuellement le CRM.
 
-Chaque site possède :
+## État réel actuel
 
-- un `siteId` public et stable;
-- des origines autorisées;
-- une clé secrète affichée une seule fois pour les appels serveur;
-- un état actif, suspendu ou révoqué;
-- des destinations configurées, comme CRM ou Appels de service (seule `crm` existe pour l'instant).
+L’intégration de sites existe déjà.
 
-Seul le hachage d'une clé est stocké (SHA-256). La rotation crée une nouvelle clé et révoque l'ancienne.
+Le projet possède :
 
-## API implémentée
+- table `sites`;
+- table `api_keys`;
+- table `form_submissions`;
+- création/rotation/révocation des clés;
+- Edge Function publique `site-submissions`;
+- contrôle CORS par origine;
+- clé de site;
+- limite de taille;
+- piège anti-robot;
+- consentement confidentialité;
+- idempotence;
+- limite de débit;
+- création contact + opportunité + activité.
 
-`POST https://mnadbkbdbjmugvsadeen.supabase.co/functions/v1/site-submissions/{siteId}`
+Cette documentation décrit l’évolution attendue de cette intégration.
 
-En-tête `x-signa-site-key` (clé secrète en clair, jamais dans le code source public du site — voir extrait fourni par la console admin).
+## Flux principal
+
+```text
+Visiteur
+  ↓
+Formulaire du site
+  ↓
+Edge Function site-submissions
+  ↓
+Validation / sécurité
+  ↓
+Normalisation
+  ↓
+Détection de doublon
+  ↓
+Contact créé ou réutilisé
+  ↓
+Opportunité créée
+  ↓
+Activité créée
+  ↓
+CRM du client
+```
+
+## API publique
+
+Route logique existante :
+
+```text
+POST /site-submissions/{siteId}
+```
+
+L’implémentation réelle passe par Supabase Edge Functions.
+
+Authentification :
+
+```text
+x-signa-site-key
+```
+
+La clé secrète :
+
+- est affichée une seule fois à la création/rotation;
+- est stockée hachée;
+- ne doit jamais apparaître dans Git;
+- ne doit jamais être exposée dans du JavaScript public si un appel serveur est possible.
+
+## Payload recommandé
 
 ```json
 {
-  "formKey": "contact-principal",
-  "idempotencyKey": "5c1e...",
+  "formKey": "demande-soumission",
+  "idempotencyKey": "uuid-ou-cle-unique",
   "contact": {
-    "name": "Alex Tremblay",
-    "email": "alex@example.ca",
-    "phone": "+14185550123"
+    "firstName": "Jean",
+    "lastName": "Tremblay",
+    "company": "Construction Tremblay",
+    "email": "jean@example.ca",
+    "phone": "+15145551234"
   },
   "message": "J'aimerais recevoir une estimation.",
   "consent": {
@@ -37,39 +96,244 @@ En-tête `x-signa-site-key` (clé secrète en clair, jamais dans le code source 
     "marketing": false
   },
   "context": {
-    "pageUrl": "https://exemple.ca/contact",
-    "utmSource": "google"
+    "pageUrl": "https://client.ca/services/plomberie",
+    "referrer": "https://www.google.com/",
+    "utmSource": "google",
+    "utmMedium": "cpc",
+    "utmCampaign": "plomberie-laval",
+    "utmContent": null,
+    "utmTerm": null
   }
 }
 ```
 
-Réponse : `202` avec identifiant de soumission, sans révéler si le contact existe.
+Les anciens payloads compatibles doivent continuer de fonctionner tant qu’une migration explicite n’est pas décidée.
 
-## Traitement
+## Champs minimums
 
-1. Vérifier le site, l'accès (clé) et l'état.
-2. Appliquer limite de débit (20/minute/site) et champ piège anti-robot.
-3. Valider et normaliser le corps (schéma strict).
-4. Dédupliquer par clé d'idempotence.
-5. Enregistrer le minimum requis (`form_submissions`).
-6. Créer l'objet métier configuré (contact + opportunité CRM).
-7. Produire une activité (pas encore de notification/courriel — voir doc 05).
+Une soumission doit idéalement fournir :
+
+- nom;
+- courriel ou téléphone;
+- consentement confidentialité;
+- `formKey`;
+- `idempotencyKey`.
+
+Un message ou les détails propres au métier peuvent être ajoutés.
+
+## Source CRM
+
+Toute soumission provenant de cette API doit créer une opportunité avec :
+
+```text
+source = website
+```
+
+Et conserver lorsque possible :
+
+```text
+source_detail = formKey
+site_id
+page_url
+utm_source
+utm_medium
+utm_campaign
+utm_content
+utm_term
+```
+
+## Normalisation des coordonnées
+
+Avant toute déduplication :
+
+### Courriel
+
+- trim;
+- lowercase.
+
+### Téléphone
+
+- retirer les caractères de formatage;
+- normaliser au format E.164 lorsque possible.
+
+Les valeurs d’origine peuvent être conservées pour affichage si nécessaire.
+
+## Détection de doublons
+
+Actuellement, chaque soumission peut créer un nouveau contact.
+
+Cette logique doit être améliorée.
+
+### Algorithme cible
+
+1. rechercher dans la même organisation un contact avec le même courriel normalisé;
+2. sinon rechercher par téléphone normalisé;
+3. si correspondance fiable :
+   - réutiliser le contact;
+4. sinon :
+   - créer le contact;
+5. créer une nouvelle opportunité pour la demande;
+6. créer l’activité;
+7. lier `form_submissions` au contact et à l’opportunité.
+
+### Important
+
+Ne jamais fusionner automatiquement deux contacts existants.
+
+L’API doit seulement décider :
+
+- réutiliser un contact fiable;
+- ou créer un nouveau contact.
+
+## Idempotence
+
+L’idempotence protège contre la répétition technique de la même soumission.
+
+Une même paire :
+
+```text
+(site_id, idempotency_key)
+```
+
+ne doit pas créer deux opportunités.
+
+Cette règle est différente de la détection de doublon CRM.
+
+### Exemple
+
+Un visiteur clique deux fois sur Envoyer :
+
+- même `idempotencyKey`;
+- une seule soumission métier.
+
+Le même client revient trois mois plus tard :
+
+- nouvelle `idempotencyKey`;
+- même contact possible;
+- nouvelle opportunité.
+
+## Activité créée
+
+Chaque demande valide doit créer une activité de type :
+
+```text
+site_submission_received
+```
+
+Contenu recommandé :
+
+```text
+Demande reçue depuis le formulaire « Demande de soumission ».
+```
+
+La timeline doit permettre de retrouver :
+
+- date;
+- formulaire;
+- page;
+- message;
+- source/campagne lorsque disponible.
+
+## Notification / relance
+
+Évolution recommandée après le traitement du prospect :
+
+```text
+nouvelle soumission
+→ créer tâche « Contacter le prospect »
+```
+
+Échéance configurable, par exemple :
+
+- immédiatement;
+- dans 1 heure;
+- le prochain jour ouvrable.
+
+La première version peut utiliser les tâches CRM avant de créer un moteur d’automatisations complet.
 
 ## Sécurité
 
-- Préférer les appels serveur à serveur — le vrai usage attendu est un `fetch()` navigateur depuis le site client, protégé par CORS + clé.
-- Ne jamais placer une clé secrète dans JavaScript public accessible sans contrôle CORS.
-- CORS n'est pas une authentification à lui seul — la clé de site reste la vraie barrière.
-- Limiter taille (16 Ko), champs, et fréquence.
+Les protections actuelles doivent être conservées :
 
-## Configuration interne
+- clé de site hachée;
+- CORS par origine;
+- antispam;
+- limite de taille;
+- rate limit;
+- consentement confidentialité;
+- idempotence;
+- statut actif/suspendu/révoqué.
 
-L'administration (`/admin/organisations/:id`, section Sites) crée le site, autorise les domaines, gère les clés (rotation, suspension, révocation) et permet un test d'intégration côté serveur (sans dépendre du navigateur, pour éviter le blocage CORS attendu depuis la console elle-même).
+### Règle Supabase critique
 
-## Webhooks sortants
+Toute fonction PostgreSQL sensible utilisée par l’Edge Function doit être auditée.
 
-Non construits (`webhook_deliveries`). Aucun consommateur externe n'existe pour l'instant — à construire quand un vrai besoin apparaît.
+Si une fonction `security definer` peut modifier des données sans vérifier elle-même l’utilisateur final :
 
-## Versionnage
+```sql
+REVOKE EXECUTE ON FUNCTION ... FROM anon;
+REVOKE EXECUTE ON FUNCTION ... FROM authenticated;
+```
 
-Route publique actuelle non versionnée explicitement dans l'URL (`site-submissions`, pas `v1`). À revoir avant un changement incompatible.
+Cette règle doit être testée explicitement.
+
+## Réponses API
+
+Réponse de succès recommandée :
+
+```json
+{
+  "ok": true,
+  "submissionId": "..."
+}
+```
+
+Ne pas révéler publiquement :
+
+- si le contact existait déjà;
+- l’identifiant interne du contact;
+- l’organisation;
+- le pipeline;
+- les détails CRM.
+
+## Administration Signa
+
+L’administration doit permettre :
+
+- créer un site;
+- choisir l’organisation;
+- déclarer les origines;
+- afficher la clé une fois;
+- copier un exemple d’intégration;
+- tester l’intégration;
+- faire une rotation de clé;
+- suspendre;
+- réactiver;
+- révoquer.
+
+## Intégration sans développeur
+
+À terme, l’objectif est que Francis puisse :
+
+1. créer le site dans Signa;
+2. copier le `siteId`;
+3. copier la clé;
+4. coller l’extrait prévu dans le site client;
+5. envoyer un test;
+6. vérifier immédiatement que le prospect apparaît.
+
+Aucune intervention dans le code de `signa-app` ne doit être nécessaire pour chaque nouveau client.
+
+## Critères de livraison de l’évolution
+
+- le courriel est conservé;
+- le téléphone est conservé;
+- la source est automatiquement `website`;
+- `formKey` est conservé;
+- les UTM utiles sont conservés;
+- les doublons sont détectés;
+- un contact existant peut être réutilisé;
+- une nouvelle demande crée toujours une nouvelle opportunité lorsque nécessaire;
+- l’idempotence reste fonctionnelle;
+- la sécurité actuelle n’est pas affaiblie;
+- les tests incluent bonne clé, mauvaise clé, mauvaise origine, doublon, idempotence et organisation étrangère.
