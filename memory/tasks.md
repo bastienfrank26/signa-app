@@ -9,6 +9,18 @@
 - [ ] `/inscription` (`SignUpPage`) reste public — nécessaire pour qu'un invité sans compte puisse s'en créer un avant de racheter son invitation ; à revoir si ça devient un vecteur d'abus (compte créé sans jamais être invité, juste bloqué sur `NoOrganizationPage`, sans conséquence réelle actuellement)
 - [ ] Paiement toujours pas branché à la création d'organisation (deux actions manuelles distinctes du staff) ; `is_org_billing_active()` toujours pas appliqué comme porte d'accès — DEC-003 pas encore pleinement réalisée, voir `docs/05-PORTAIL-CLIENT.md`
 
+## Terminées (vrai test site-submissions, pas synthétique) — 2026-09-13
+
+- [x] `site-submissions` testé avec un vrai site externe pour la première fois — jusqu'ici seul le bouton « tester l'intégration » (staff, synthétique) existait
+- [x] Organisation « Les Frères Barbiers » + site créés via l'admin (compte staff), branchés à `/var/www/html/signa-web-barbier` (repo séparé, `github.com/bastienfrank26/signa-web-barbier`, hors de portée git de cette session — `gh` connecté en `groupe-reca`)
+- [x] `ContactForm.tsx` et `BookingModal.tsx` de ce site réellement câblés à l'API (`src/lib/signaApi.ts`) — avant ça, les deux étaient explicitement des simulations sans backend (« No backend exists for this template »), malgré un souvenir de Francis qu'un système de rendez-vous y était branché
+- [x] Ajouté au passage : case à cocher de consentement (obligatoire, absente avant — le schéma `site-submissions` l'exige) et champ piège anti-robot sur les deux formulaires
+- [x] Site servi en local via pm2 (`les-barbieres`, port **3040** — 3030 était déjà pris par `reca-operator`, corrigé après un premier essai raté ; `ecosystem.config.cjs` mis à jour dans ce repo séparé)
+- [x] Vérifié avec Playwright + lecture DB directe : deux vraies requêtes HTTP (contact + réservation), deux `202`, contact + opportunité créés dans le CRM avec la bonne source (« Formulaire du site ») et les bons détails
+- [x] **Confirme en pratique un gap déjà documenté** : aucune déduplication — 3 contacts « Jean Testeur » identiques créés par mes essais successifs avant le correctif de port. Pas corrigé ici (portée du travail de doublons, voir section CRM enrichie ci-dessous), juste laissé comme donnée de test réelle dans l'organisation
+- [ ] Site pas exposé publiquement (pas de domaine/nginx/SSL) — seulement `localhost:3040`, suffisant pour valider l'API mais pas pour un vrai client
+- [ ] Repo `signa-web-barbier` a beaucoup de changements non commités (préexistants, pas de moi) en plus des miens (`ContactForm.tsx`, `BookingModal.tsx`, `signaApi.ts`, `ecosystem.config.cjs`, `.env.local`) — pas touché à git dans ce repo, pas mon travail à committer sans demander
+
 ## Documentation CRM enrichie par Francis — 2026-09-13
 
 `docs/01-PERIMETRE-ET-MVP.md`, `03-MODELE-DE-DONNEES.md`, `06-MODULE-CRM.md`, `07-INTEGRATION-DES-SITES.md` remplacés par les versions fournies dans `.input/docs-need-to-update/` (gitignored, pas dans le dépôt). Specs beaucoup plus détaillées qu'avant, pas juste des ajustements — introduisent des besoins réels **pas encore construits** :
