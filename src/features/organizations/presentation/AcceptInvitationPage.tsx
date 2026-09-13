@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '../../../infrastructure/supabase/client';
 import { createSupabaseOrganizationRepository } from '../infrastructure/supabase/SupabaseOrganizationRepository';
-import { useAuth } from '../../auth/presentation/useAuth';
+import { useAuth } from '@signa/sdk';
 import { primaryButtonStyle } from '../../auth/presentation/formStyles';
 
 const repository = createSupabaseOrganizationRepository(supabase);

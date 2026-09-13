@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from './useAuth';
+import { useAuth } from '@signa/sdk';
 import AuthLayout from './AuthLayout';
 import { fieldStyle, labelStyle, primaryButtonStyle } from './formStyles';
 

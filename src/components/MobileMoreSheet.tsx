@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { initials, useAppActions, useAppState } from '../AppContext';
-import { useAuth } from '../features/auth/presentation/useAuth';
+import { useAuth } from '@signa/sdk';
 import { ALL_NAV_ITEMS, MOBILE_PRIMARY_SCREENS } from '../navigation';
 import Button from './ui/Button';
 import type { Screen } from '../types';

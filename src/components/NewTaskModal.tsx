@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAppActions } from '../AppContext';
-import { useAuth } from '../features/auth/presentation/useAuth';
+import { useAuth } from '@signa/sdk';
 import { createSupabaseCrmRepository } from '../features/crm/infrastructure/supabase/SupabaseCrmRepository';
 import { supabase } from '../infrastructure/supabase/client';
 

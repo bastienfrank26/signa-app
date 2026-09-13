@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useAuth } from '../features/auth/presentation/useAuth';
+import { useAuth } from '@signa/sdk';
 import { useProjectBundle } from '../features/portal/presentation/useProjectBundle';
 
 const categoryLabels: Record<string, string> = {

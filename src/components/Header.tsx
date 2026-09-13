@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useAuth } from '../features/auth/presentation/useAuth';
+import { useAuth } from '@signa/sdk';
 import { initials } from '../AppContext';
 
 const roleLabels: Record<string, string> = {

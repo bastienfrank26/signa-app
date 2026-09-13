@@ -1,5 +1,5 @@
 import { money, initials, stageColor, useAppActions, useAppState } from '../AppContext';
-import { useAuth } from '../features/auth/presentation/useAuth';
+import { useAuth } from '@signa/sdk';
 import { formatNextFollowUp, formatRelativeTime } from '../features/crm/domain/format';
 import { useOrgMembers } from '../features/crm/presentation/useOrgMembers';
 import { avatarStyle, tag } from '../ui';

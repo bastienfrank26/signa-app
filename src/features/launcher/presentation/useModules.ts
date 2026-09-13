@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useAuth } from '../../auth/presentation/useAuth';
+import { useAuth } from '@signa/sdk';
 import { fetchModules } from '../infrastructure/signaCore/SignaCoreModulesGateway';
 import type { SignaModule } from '../domain/module';
 

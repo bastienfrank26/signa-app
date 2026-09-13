@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { useAuth } from '../../auth/presentation/useAuth';
+import { useAuth } from '@signa/sdk';
 import { useProjectBundle } from './useProjectBundle';
 import { projectStatusLabels, revisionStatusLabels, type RevisionPriority } from '../domain/project';
 import { fieldStyle, labelStyle, primaryButtonStyle } from '../../auth/presentation/formStyles';

@@ -1,5 +1,5 @@
 import { useAppActions } from '../../../AppContext';
-import { useAuth } from '../../auth/presentation/useAuth';
+import { useAuth } from '@signa/sdk';
 import { useProjectBundle } from './useProjectBundle';
 import { projectStatusLabels } from '../domain/project';
 

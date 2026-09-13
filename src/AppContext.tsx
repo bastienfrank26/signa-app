@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { useAuth } from './features/auth/presentation/useAuth';
+import { useAuth } from '@signa/sdk';
 import { supabase } from './infrastructure/supabase/client';
 import { createSupabaseCrmRepository } from './features/crm/infrastructure/supabase/SupabaseCrmRepository';
 import { stageColorByKey } from './features/crm/domain/stageColors';

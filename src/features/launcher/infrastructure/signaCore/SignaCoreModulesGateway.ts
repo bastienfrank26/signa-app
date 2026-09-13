@@ -1,4 +1,4 @@
-import { signaCoreFetch } from '../../../../infrastructure/signaCore/client';
+import { signaCore } from '../../../../infrastructure/signaCore/client';
 import type { SignaModule } from '../../domain/module';
 
 interface ModulesResponse {
@@ -16,7 +16,7 @@ interface ModulesResponse {
 }
 
 export async function fetchModules(organizationId: string): Promise<SignaModule[]> {
-  const res = await signaCoreFetch<ModulesResponse>(`/api/v1/modules?organizationId=${encodeURIComponent(organizationId)}`);
+  const res = await signaCore.get<ModulesResponse>(`/api/v1/modules?organizationId=${encodeURIComponent(organizationId)}`);
   return res.modules.map((m) => ({
     id: m.id,
     slug: m.slug,

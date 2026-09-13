@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import { initials } from '../../../AppContext';
-import { useAuth } from '../../auth/presentation/useAuth';
+import { useAuth } from '@signa/sdk';
 
 const roleLabels: Record<string, string> = {
   owner: 'Propriétaire',

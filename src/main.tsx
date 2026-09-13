@@ -4,8 +4,8 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import CrmPrototype from './App';
 import RequireOrganization from './RequireOrganization';
 import AcceptInvitationPage from './features/organizations/presentation/AcceptInvitationPage';
-import { AuthProvider } from './features/auth/presentation/AuthProvider';
-import { RequireAuth, RequireNoAuth } from './features/auth/presentation/guards';
+import { AuthProvider, RequireAuth, RequireNoAuth } from '@signa/sdk';
+import { supabase } from './infrastructure/supabase/client';
 import LoginPage from './features/auth/presentation/LoginPage';
 import SignUpPage from './features/auth/presentation/SignUpPage';
 import ForgotPasswordPage from './features/auth/presentation/ForgotPasswordPage';
@@ -19,7 +19,7 @@ import './styles/global.css';
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
-      <AuthProvider>
+      <AuthProvider client={supabase}>
         <Routes>
           <Route path="/reinitialiser-mot-de-passe" element={<ResetPasswordPage />} />
           <Route element={<RequireNoAuth />}>

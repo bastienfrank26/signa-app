@@ -4,7 +4,7 @@ import { formatRelativeTime, formatNextFollowUp } from '../features/crm/domain/f
 import ProjectStatusCard from '../features/portal/presentation/ProjectStatusCard';
 import { useProjectBundle } from '../features/portal/presentation/useProjectBundle';
 import { projectStatusLabels } from '../features/portal/domain/project';
-import { useAuth } from '../features/auth/presentation/useAuth';
+import { useAuth } from '@signa/sdk';
 
 const cardStyle = {
   borderRadius: 14,

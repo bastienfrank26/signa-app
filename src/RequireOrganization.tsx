@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import { useAuth } from './features/auth/presentation/useAuth';
+import { useAuth, AuthLoadingState } from '@signa/sdk';
 import { supabase } from './infrastructure/supabase/client';
-import { AuthLoadingState } from './features/auth/presentation/guards';
 import NoOrganizationPage from './features/organizations/presentation/NoOrganizationPage';
 
 function useIsStaff(enabled: boolean): { isStaff: boolean; loading: boolean } {

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { initials } from '../AppContext';
 import { avatarStyle, tag } from '../ui';
-import { useAuth } from '../features/auth/presentation/useAuth';
+import { useAuth } from '@signa/sdk';
 import { useContacts } from '../features/crm/presentation/useContacts';
 import NewContactModal from './NewContactModal';
 import ContactDrawer from './ContactDrawer';

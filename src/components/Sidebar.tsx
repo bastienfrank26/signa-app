@@ -1,5 +1,5 @@
 import { initials, useAppActions, useAppState } from '../AppContext';
-import { useAuth } from '../features/auth/presentation/useAuth';
+import { useAuth } from '@signa/sdk';
 import { navStyle } from '../ui';
 import { NAV_SECTIONS } from '../navigation';
 import type { Screen } from '../types';

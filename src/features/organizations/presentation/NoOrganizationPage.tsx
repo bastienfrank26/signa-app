@@ -1,4 +1,4 @@
-import { useAuth } from '../../auth/presentation/useAuth';
+import { useAuth } from '@signa/sdk';
 
 /**
  * DEC-020 : plus d'inscription libre — seul le personnel Signa crée une
