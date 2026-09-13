@@ -1,5 +1,15 @@
 # Tâches atomiques
 
+## Terminées (déduplication de contacts) — 2026-09-13
+
+- [x] `email_normalized`/`phone_normalized` ajoutés à `contacts` (déclencheur `contacts_set_normalized`, backfill fait) — migration `20260913010000_contact_deduplication.sql`
+- [x] `normalize_email`/`normalize_phone` (meilleur effort E.164 nord-américain, comme documenté : `(514) 555-1234` → `+15145551234`)
+- [x] `capture_site_submission_v1` (utilisé par `site-submissions`) réutilise un contact existant par courriel/téléphone normalisé au lieu d'en créer un nouveau à chaque soumission ; crée toujours une nouvelle opportunité pour la demande ; ne modifie jamais les coordonnées existantes (doc 07 : "ne jamais écraser silencieusement")
+- [x] `find_duplicate_contact(organization_id, email, phone)` : RPC prête pour la création manuelle, **pas encore branchée côté UI** — `NewProspectModal`/`createProspect` n'a pas de champs courriel/téléphone (voir item séparé plus bas), donc rien à dédupliquer à la création manuelle pour l'instant
+- [x] Vérifié en conditions réelles (pas juste en local) : soumission répétée pour `jean.testeur@example.com` sur l'organisation « Les Frères Barbiers » — contact réutilisé (2e occasion sur le même contact), pas de 4e doublon créé. Confirmé aussi : les 3 doublons créés *avant* ce correctif restent tels quels (pas de fusion rétroactive, comportement voulu — "aucune fusion destructive automatique")
+- [x] Vérifié : `capture_site_submission_v1` reste inexécutable par `anon`/`authenticated` après le remplacement de la fonction (le `REVOKE` d'une migration antérieure survit à un `CREATE OR REPLACE FUNCTION`)
+- [ ] Détection de doublons à la création manuelle (`+ Ajouter un prospect`) — bloquée tant que ce formulaire n'a pas de champs courriel/téléphone (voir section CRM enrichie ci-dessous)
+
 ## Terminées (DEC-020, onboarding) — 2026-09-13
 
 - [x] Inscription libre retirée : `organizations_insert_authenticated` (n'importe quel authentifié) remplacée par `organizations_insert_staff_admin` (`is_internal_admin()` seulement) — migration `20260913000000_remove_self_signup_org_creation.sql`
@@ -27,7 +37,7 @@
 
 - [ ] Contact : séparer `first_name`/`last_name` (actuellement un seul `name`), ajouter `email_normalized`/`phone_normalized` (déduplication), `lifecycle_status` (prospect/client/inactive), `owner_user_id`
 - [ ] Opportunité : `title`, `source_detail`, `site_id`, `form_key`, `landing_page`, UTM (`utm_source/medium/campaign/content/term`), `owner_user_id`, `won_at`/`lost_at` distincts
-- [ ] **Détection de doublons** (création manuelle ET soumission web) par courriel/téléphone normalisés — actuellement chaque soumission web crée toujours un nouveau contact (déjà noté comme manque avant, maintenant spécifié en détail)
+- [x] **Détection de doublons côté soumission web** — faite le 2026-09-13, voir section dédiée plus bas. Reste côté création manuelle (bloqué par l'absence de champs courriel/téléphone dans ce formulaire)
 - [ ] Formulaire « + Ajouter un prospect » enrichi : courriel, téléphone, source, étape initiale, responsable, prochaine relance (actuellement juste nom/besoin/valeur)
 - [ ] Conversion prospect gagné → client (`lifecycle_status`, activité `converted_to_client`) — pas de notion de "client" actuellement, seulement des opportunités gagnées/perdues
 - [ ] Assignation d'un responsable (`owner_user_id`) sur contact/opportunité — aucune notion de responsable actuellement
