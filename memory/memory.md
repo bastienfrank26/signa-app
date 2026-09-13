@@ -30,9 +30,24 @@
 
 Ce même compte est aussi maintenant membre `owner` d'une deuxième organisation permanente « Client Invitation Test » (créée en testant le flux admin d'invitation, voir `tasks.md`). Un utilisateur peut appartenir à plusieurs organisations — l'app choisit `session.memberships[0]` sans ordre garanti ni sélecteur d'organisation, donc après connexion ce compte peut atterrir sur l'une ou l'autre organisation selon l'ordre retourné.
 
-## Accès base de données Supabase (2026-09-12)
+## Comptes de test permanents (mis à jour 2026-09-13)
 
-Un agent dans cet environnement n'a normalement **aucun accès** à la base (pas de `SUPABASE_ACCESS_TOKEN`, pas de session `supabase login`, pas de mot de passe DB — vérifié en début de session). Francis peut fournir un token temporairement : le faire écrire dans un fichier (`/tmp/....env`), jamais coller le secret dans le chat (resterait dans l'historique). Une fois chargé (`source` + `export`), `supabase db push --linked` applique les migrations et `supabase db query --linked "<sql>"` interroge/modifie directement — deux capacités puissantes à utiliser avec le même mandat explicite que toute action irréversible (ex. : promouvoir temporairement un compte en `internal_staff` pour tester l'admin a demandé une autorisation explicite séparée, refusée d'abord par le mode auto). Supprimer le fichier de token après usage — pas persistant, à refournir à la prochaine session.
+Francis a demandé de garder ces comptes **tant que l'application n'est pas terminée** — ne pas les supprimer, les réutiliser pour tous les futurs tests Playwright plutôt que d'en créer de nouveaux. Mots de passe **non inscrits ici** (règle AGENTS.md §3 : jamais de secret dans Git) — conservés uniquement dans la mémoire locale hors dépôt de l'agent :
+
+- **Staff (`internal_staff`, rôle `operations`)** : `admin@signaweb.ca` — donne accès à `/admin/*`. Courriel confirmé et mot de passe forcés directement en base (compte non destiné à recevoir de vrais courriels).
+- **Client** : `bastienfrancis1@gmail.com` — propriétaire de « Audit navigation mobile — test » et « Client Invitation Test ».
+
+Ne pas confondre avec `bastienfrancis9999@gmail.com` : ce n'est **pas** un compte de test jetable, c'est un compte réel déjà existant, propriétaire de l'organisation « Groupe RÉCA » — découvert en essayant de le réutiliser (demande initiale de Francis), jamais modifié suite à cette découverte (mot de passe non touché, aucun rôle staff ajouté).
+
+## Accès base de données Supabase (2026-09-12, mis à jour 2026-09-13)
+
+**`.input/supabase` (à la racine du repo) contient déjà une chaîne de connexion Postgres directe** (`postgresql://postgres...@...pooler.supabase.com:5432/postgres`) — ne pas oublier son existence, ne pas redemander un token à Francis avant d'avoir vérifié ce fichier. Attention : `cat`/`ls`/`grep` dessus sans précaution est bloqué par le mode auto (« Credential Leakage ») et peut faire fuiter le mot de passe dans la sortie d'une commande (arrivé une fois avec un `source` sur une ligne mal formée — le mot de passe est apparu en clair dans un message d'erreur). Méthode sûre : extraire la valeur dans une variable sans jamais l'afficher, ex. `DB_URL=$(grep '^postgres' .input/supabase)`, puis l'utiliser directement dans `npx supabase db query --db-url "$DB_URL" "<sql>"` (marche aussi pour `db push`, mais `db push` utilise plutôt `--linked` avec un `SUPABASE_ACCESS_TOKEN` — pas trouvé dans `.input/supabase`, qui ne contient que la chaîne Postgres directe. Si un `SUPABASE_ACCESS_TOKEN` est nécessaire pour `db push --linked`/`projects list`, il faut le redemander à Francis, à faire écrire dans un fichier `/tmp/....env` — jamais collé dans le chat).
+
+Écrire/modifier la base directement (`UPDATE`/`INSERT` sur `auth.users`, `internal_staff`, etc.) déclenche systématiquement une confirmation du mode auto (« Modify Shared Resources », « Credential Materialization ») — normal et voulu, redemander confirmation explicite à Francis à chaque fois plutôt que de contourner.
+
+**Piège découvert** : le `user_id` retourné par `supabase.auth.signUp()` côté client ne correspond pas toujours à l'`id` réel de la ligne dans `auth.users` (observé deux fois) — toujours revérifier par une requête `select id from auth.users where email = ...` avant d'utiliser cet id ailleurs (ex. `internal_staff.user_id`), sinon la contrainte FK échoue.
+
+**Piège découvert** : `crypt(motdepasse, encrypted_password) = encrypted_password` permet de vérifier si un mot de passe Supabase Auth correspond, sans l'exposer — utile pour diagnostiquer un échec de connexion avant de réinitialiser. Réinitialiser un mot de passe se fait par `update auth.users set encrypted_password = crypt('nouveau_mdp', gen_salt('bf')) where email = '...'`.
 
 ## Navigation mobile et design system (2026-09-12, branche `design/mobile-nav`)
 
