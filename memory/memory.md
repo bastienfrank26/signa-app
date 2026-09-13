@@ -15,8 +15,13 @@
 
 ## GitHub
 
-- Repo officiel visé par AGENTS.md : `bastienfrank26/signa-app` — mais le compte `gh` connecté sur ce serveur est `groupe-reca`, sans accès à `bastienfrank26`.
-- Décision temporaire (2026-09-12) : repo créé sous `groupe-reca/signa-app` (privé) en attendant transfert de propriété vers `bastienfrank26`.
+- Repo officiel : `bastienfrank26/signa-app` (remote `official`). Le remote `origin` (`groupe-reca/signa-app`) reste synchronisé aussi, mais toute nouvelle décision doit considérer `official`/`bastienfrank26` comme la source de vérité (confirmé par Francis le 2026-09-13). Toujours pousser sur les deux tant que `origin` existe.
+
+## Projet Supabase (mis à jour 2026-09-13)
+
+**Changement majeur** : la base est passée du projet `mnadbkbdbjmugvsadeen` à `txhzmnglcvmsbwgmuiwa` (compte Pro personnel de Francis, voir `signa-docs/memory/decisions.md`). Schéma (19 migrations + `modules`/`organization_modules` de `signa-core`) réappliqué sur le nouveau projet, **vide au départ** — donc **toutes les données de l'ancien projet sont perdues** (pas de dump/restore fait, juste les migrations de structure). Les comptes de test permanents documentés ci-dessous (`admin@signaweb.ca`, `bastienfrancis1@gmail.com`, etc.) **n'existent plus** sur le nouveau projet — à recréer si nécessaire avant de les réutiliser. `.env.local` de ce repo et de `signa-core` pointent déjà vers le nouveau projet.
+
+Nouveau compte de test créé le 2026-09-13 sur le nouveau projet, pour valider `signa-core` et le SSO cookie (voir `signa-core/memory/tasks.md` pour l'identifiant exact). Mot de passe non inscrit ici (règle AGENTS.md).
 
 ## Décisions ouvertes
 
@@ -52,6 +57,12 @@ Ne pas confondre avec `bastienfrancis9999@gmail.com` : ce n'est **pas** un compt
 ## Navigation mobile et design system (2026-09-12, branche `design/mobile-nav`)
 
 Décision : le shell client/CRM avait une navigation mobile factice (cadre de téléphone + toggle JS Bureau/Mobile dans `App.tsx`/`MobileView.tsx`), pas de vraie media query. Remplacé par une vraie navigation responsive (barre d'onglets bas d'écran + feuille « Plus », seuil CSS 768 px) et un premier composant `Button` factorisé, comme point de départ du design system réel (`docs/11-DESIGN-SYSTEM.md` mis à jour). Détail dans `tasks.md`. Reste explicitement hors scope de cette passe : `ProspectsScreen` (toujours défilement horizontal sous 768 px) et `AdminLayout` (console interne, non responsive, jugé acceptable).
+
+## SSO / session partagée (2026-09-13, Phase 2 signa-docs)
+
+Client Supabase (`src/infrastructure/supabase/client.ts`) migré de `createClient` (localStorage) vers `createBrowserClient` de `@supabase/ssr`, avec cookie `domain: .signaweb.ca` en production (omis en local, hôte ne finit pas par `signaweb.ca`). Validé via Playwright en prod : cookie `sb-*-auth-token` avec `domain=.signaweb.ca`, `secure`, `sameSite=Lax`; `localStorage` vide.
+
+**Logout global déjà acquis sans code additionnel** : `client.auth.signOut()` (défaut `scope: 'global'` dans auth-js) révoque déjà toutes les sessions serveur, et le cookie partagé disparaît pour tout `*.signaweb.ca` dans ce navigateur. Testé : après déconnexion, un ancien JWT est rejeté (401) par `signa-core`. Aucune seconde app réelle n'existe encore pour prouver la reconnaissance de session cross-app en conditions réelles (signa-admin/signa-crm pas créés) — le mécanisme (cookie domaine + vérification JWT côté signa-core, indépendante de l'origine) est en place et validé au niveau technique.
 
 ## État du prototype (2026-09-12)
 
