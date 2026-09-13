@@ -4,19 +4,66 @@ import { useAuth } from '../features/auth/presentation/useAuth';
 import { createSupabaseCrmRepository } from '../features/crm/infrastructure/supabase/SupabaseCrmRepository';
 import { supabase } from '../infrastructure/supabase/client';
 import { formatRelativeTime } from '../features/crm/domain/format';
+import { useOrgMembers } from '../features/crm/presentation/useOrgMembers';
 import { avatarStyle, tag } from '../ui';
-import type { ContactDetail } from '../features/crm/domain/crm';
+import type { ContactDetail, ContactFile } from '../features/crm/domain/crm';
 
 const repository = createSupabaseCrmRepository(supabase);
+
+function formatSize(bytes: number | null): string {
+  if (bytes == null) return '—';
+  if (bytes < 1024) return `${bytes} o`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} Ko`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} Mo`;
+}
 
 export default function ContactDrawer({ contactId, onClose }: { contactId: string; onClose: () => void }) {
   const { session } = useAuth();
   const organizationId = session?.memberships[0]?.organizationId ?? null;
+  const { emailOf } = useOrgMembers(organizationId);
   const [detail, setDetail] = useState<ContactDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [note, setNote] = useState('');
   const [saving, setSaving] = useState(false);
+  const [files, setFiles] = useState<ContactFile[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
+
+  const loadFiles = useCallback(async () => {
+    setFiles(await repository.listContactFiles(contactId));
+  }, [contactId]);
+
+  useEffect(() => {
+    void loadFiles();
+  }, [loadFiles]);
+
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file || !organizationId) return;
+    setUploading(true);
+    try {
+      await repository.uploadContactFile(organizationId, contactId, file);
+      await loadFiles();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Le téléversement a échoué.');
+    } finally {
+      setUploading(false);
+      e.target.value = '';
+    }
+  }
+
+  async function handleDownload(fileId: string, storagePath: string) {
+    setDownloadingId(fileId);
+    try {
+      const url = await repository.getContactFileUrl(storagePath);
+      window.open(url, '_blank', 'noopener');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Le téléchargement a échoué.');
+    } finally {
+      setDownloadingId(null);
+    }
+  }
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -63,7 +110,10 @@ export default function ContactDrawer({ contactId, onClose }: { contactId: strin
               <div style={{ display: 'flex', gap: 12, alignItems: 'center', minWidth: 0 }}>
                 <span style={avatarStyle(0, 44)}>{initials(detail.companyName || detail.name)}</span>
                 <div style={{ minWidth: 0 }}>
-                  <div style={{ fontSize: 19, fontWeight: 800, letterSpacing: '-.02em' }}>{detail.name}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{ fontSize: 19, fontWeight: 800, letterSpacing: '-.02em' }}>{detail.name}</div>
+                    {detail.lifecycleStatus === 'client' && <span style={tag('#1F7A5C')}>Client</span>}
+                  </div>
                   <div style={{ fontSize: 13, color: '#7A8899' }}>{detail.companyName || '—'}</div>
                 </div>
               </div>
@@ -80,6 +130,7 @@ export default function ContactDrawer({ contactId, onClose }: { contactId: strin
               <InfoBox label="TÉLÉPHONE" value={detail.phone || '—'} />
               <InfoBox label="SOURCE" value={detail.source || '—'} />
               <InfoBox label="AJOUTÉ" value={formatRelativeTime(detail.createdAt)} />
+              <InfoBox label="RESPONSABLE" value={emailOf(detail.ownerUserId) ?? 'Non assigné'} wrap />
             </div>
 
             <div>
@@ -112,6 +163,34 @@ export default function ContactDrawer({ contactId, onClose }: { contactId: strin
               >
                 Enregistrer l'activité
               </button>
+            </div>
+
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                <div style={{ fontSize: 14, fontWeight: 800 }}>Fichiers</div>
+                <label style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--sg-accent)', cursor: uploading ? 'not-allowed' : 'pointer' }}>
+                  {uploading ? 'Envoi…' : '+ Ajouter'}
+                  <input type="file" onChange={(e) => void handleFileChange(e)} disabled={uploading} style={{ display: 'none' }} />
+                </label>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {files.map((f) => (
+                  <div key={f.id} style={{ display: 'flex', alignItems: 'center', gap: 10, border: '1px solid var(--sg-border)', borderRadius: 11, padding: '9px 12px' }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.fileName}</div>
+                      <div style={{ fontSize: 11, color: '#9AA6B2' }}>{formatSize(f.sizeBytes)} · {new Date(f.createdAt).toLocaleDateString('fr-CA')}</div>
+                    </div>
+                    <button
+                      onClick={() => void handleDownload(f.id, f.storagePath)}
+                      disabled={downloadingId === f.id}
+                      style={{ minHeight: 32, padding: '0 12px', borderRadius: 8, border: '1px solid var(--sg-border-strong)', background: '#fff', fontSize: 12, fontWeight: 700, cursor: downloadingId === f.id ? 'not-allowed' : 'pointer', flex: 'none' }}
+                    >
+                      {downloadingId === f.id ? 'Ouverture…' : 'Télécharger'}
+                    </button>
+                  </div>
+                ))}
+                {files.length === 0 && <div style={{ fontSize: 12.5, color: '#9AA6B2' }}>Aucun fichier pour ce contact.</div>}
+              </div>
             </div>
 
             <div>

@@ -7,6 +7,8 @@ export interface Stage {
   isLost: boolean;
 }
 
+export type LifecycleStatus = 'prospect' | 'client' | 'inactive';
+
 export interface Prospect {
   id: string;
   contactId: string;
@@ -19,6 +21,13 @@ export interface Prospect {
   email: string;
   phone: string;
   nextFollowUpAt: string | null;
+  ownerUserId: string | null;
+  lifecycleStatus: LifecycleStatus;
+  utmSource: string | null;
+  utmMedium: string | null;
+  utmCampaign: string | null;
+  wonAt: string | null;
+  lostAt: string | null;
 }
 
 export interface ActivityItem {
@@ -50,6 +59,9 @@ export interface NewProspectInput {
   name: string;
   need: string;
   valueCents: number;
+  email?: string;
+  phone?: string;
+  ownerUserId?: string;
 }
 
 export interface Contact {
@@ -60,6 +72,8 @@ export interface Contact {
   phone: string;
   source: string;
   createdAt: string;
+  ownerUserId: string | null;
+  lifecycleStatus: LifecycleStatus;
 }
 
 export interface NewContactInput {
@@ -67,6 +81,29 @@ export interface NewContactInput {
   companyName?: string;
   email?: string;
   phone?: string;
+  ownerUserId?: string;
+}
+
+export interface DuplicateContactMatch {
+  id: string;
+  name: string;
+  companyName: string;
+  email: string;
+  phone: string;
+}
+
+export interface OrgMember {
+  userId: string;
+  email: string;
+}
+
+export interface ContactFile {
+  id: string;
+  fileName: string;
+  storagePath: string;
+  mimeType: string | null;
+  sizeBytes: number | null;
+  createdAt: string;
 }
 
 export interface NewTaskInput {

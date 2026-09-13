@@ -7,6 +7,20 @@
 - [x] Vérifié avec le compte staff, en vrai (390px) : navigation entre les 3 sections + feuille Plus, zéro erreur console
 - [ ] Tableaux admin (liste d'organisations) toujours en grille bureau compressée sur mobile, pas de vraies cartes — même limitation qu'on a acceptée pour Prospects/Contacts côté CRM, pas corrigée ici non plus
 
+## Terminées (formulaire enrichi, responsable, lifecycle, fichiers contact) — 2026-09-13
+
+- [x] **Formulaire manuel enrichi** : `NewProspectModal.tsx`/`NewContactModal.tsx` ont maintenant courriel/téléphone/responsable — rendu possible la dédup côté création manuelle (`find_duplicate_contact`, RPC déjà prête depuis la passe précédente). Comportement exact du doc 06 : correspondance trouvée → « Ce prospect existe peut-être déjà » avec **Ouvrir la fiche** / **Créer quand même**
+- [x] `NewProspectModal.tsx` refactorisé en composant autonome (comme `NewContactModal`/`NewTaskModal`) — `AppContext` allégé (`fName`/`fSub`/`fValue`/`formError`/`submitNew` retirés, ne reste que le toggle `newOpen`/`openNew`/`closeNew`)
+- [x] **Responsable** : `owner_user_id` sur `contacts`/`opportunities`, sélecteur peuplé par `org_member_directory` (nouvelle RPC — un membre ne pouvait pas voir le courriel d'un autre membre avant, seul le personnel Signa avait cet annuaire). Affiché sur `ProspectDrawer`/`ContactDrawer` via `useOrgMembers`
+- [x] **`lifecycle_status`** (prospect/client/inactive) : une occasion marquée « Gagné » marque maintenant le contact `client` (déclencheur `log_opportunity_stage_activity` étendu, active aussi `won_at`/`lost_at`) + active `converted_to_client`. Badge « Client » sur `ProspectDrawer`/`ContactDrawer`/`ContactsScreen`. Vérifié en réel : gagner une occasion crée bien les deux activités (« Occasion gagnée » + « … devient client »)
+- [x] **UTM sur les opportunités** : colonnes `utm_source/medium/campaign/content/term`, `source_detail`, `site_id`, `landing_page` ajoutées ; `capture_site_submission_v1` les remplit depuis le formulaire web
+- [x] **Fichiers attachés à une fiche contact** — le vrai morceau CRM manquant identifié hier : table `contact_files` + bucket Storage `crm-files` (patron identique à `project_files`/`project-files`), section Fichiers dans `ContactDrawer.tsx` (upload/liste/téléchargement). Vérifié en réel : téléversement + téléchargement fonctionnent
+- [x] Vérifié de bout en bout avec Playwright (compte client de test) : prospect enrichi créé, doublon détecté sur 2e création, responsable affiché, fichier contact téléversé/téléchargé, conversion gagné→client — zéro erreur console
+- [ ] **Gap trouvé en vérifiant, pas corrigé complètement** : l'Edge Function `site-submissions` (schéma zod) n'acceptait que `utmSource` dans `context` — `utmMedium`/`utmCampaign`/`utmContent`/`utmTerm` auraient été silencieusement retirés avant d'atteindre la base. Code corrigé (`supabase/functions/site-submissions/index.ts`) mais **pas déployé** : `supabase functions deploy` exige `SUPABASE_ACCESS_TOKEN` (API de gestion), pas seulement la connexion Postgres directe (`.input/supabase`) utilisée pour les migrations cette session. À déployer avec le bon token avant que les UTM réels fonctionnent depuis un vrai site
+- [ ] Premier/dernier nom séparés (`first_name`/`last_name`, doc 03) — pas fait, `name` unique conservé pour limiter la portée de cette passe
+- [ ] Pas de sélecteur pour changer le responsable après création (affiché en lecture seule sur les fiches)
+- [ ] « Ouvrir la fiche » (avertissement de doublon) navigue vers Contacts mais n'ouvre pas automatiquement la fiche du doublon — l'utilisateur doit la retrouver (recherche)
+
 ## Terminées (déduplication de contacts) — 2026-09-13
 
 - [x] `email_normalized`/`phone_normalized` ajoutés à `contacts` (déclencheur `contacts_set_normalized`, backfill fait) — migration `20260913010000_contact_deduplication.sql`

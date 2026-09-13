@@ -35,6 +35,10 @@ const requestSchema = z
       .object({
         pageUrl: z.string().trim().max(500).optional(),
         utmSource: z.string().trim().max(100).optional(),
+        utmMedium: z.string().trim().max(100).optional(),
+        utmCampaign: z.string().trim().max(100).optional(),
+        utmContent: z.string().trim().max(100).optional(),
+        utmTerm: z.string().trim().max(100).optional(),
       })
       .optional(),
     // Champ piège : un formulaire humain le laisse vide.

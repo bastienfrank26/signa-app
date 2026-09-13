@@ -29,6 +29,7 @@
 - `application/CrmRepository.ts` — interface (port), inclut `listContacts`/`createContact`/`getContactDetail`/`addContactNote`
 - `infrastructure/supabase/SupabaseCrmRepository.ts` — implémentation Supabase
 - `presentation/useContacts.ts` — hook de chargement/rechargement des contacts (patron `useProjectBundle.ts`)
+- `presentation/useOrgMembers.ts` (2026-09-13) — résout `owner_user_id` en courriel via `org_member_directory`, partagé par ProspectDrawer/ContactDrawer
 - `src/components/ContactsScreen.tsx`, `ContactDrawer.tsx`, `NewContactModal.tsx` — écran Contacts (liste, fiche, création)
 - `src/components/TasksScreen.tsx`, `NewTaskModal.tsx` — écran Tâches (filtres, création), lit `AppContext` directement (tâches déjà dans `CrmBundle`)
 - `src/components/FilesScreen.tsx` — écran Fichiers du portail (upload, liste, téléchargement), utilise `useProjectBundle`/`ProjectRepository` — **pas du CRM**, voir note dans doc 06

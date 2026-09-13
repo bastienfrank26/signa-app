@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { initials } from '../AppContext';
-import { avatarStyle } from '../ui';
+import { avatarStyle, tag } from '../ui';
 import { useAuth } from '../features/auth/presentation/useAuth';
 import { useContacts } from '../features/crm/presentation/useContacts';
 import NewContactModal from './NewContactModal';
@@ -91,7 +91,10 @@ export default function ContactsScreen() {
               <div style={{ display: 'flex', alignItems: 'center', gap: 11, minWidth: 0 }}>
                 <span style={avatarStyle(i, 34)}>{initials(c.companyName || c.name)}</span>
                 <div style={{ minWidth: 0, lineHeight: 1.3 }}>
-                  <div style={{ fontSize: 14, fontWeight: 700 }}>{c.name}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <div style={{ fontSize: 14, fontWeight: 700 }}>{c.name}</div>
+                    {c.lifecycleStatus === 'client' && <span style={tag('#1F7A5C')}>Client</span>}
+                  </div>
                   <div style={{ fontSize: 12, color: '#7A8899' }}>{c.companyName || '—'}</div>
                 </div>
               </div>

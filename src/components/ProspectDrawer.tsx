@@ -1,10 +1,14 @@
 import { money, initials, stageColor, useAppActions, useAppState } from '../AppContext';
+import { useAuth } from '../features/auth/presentation/useAuth';
 import { formatNextFollowUp, formatRelativeTime } from '../features/crm/domain/format';
+import { useOrgMembers } from '../features/crm/presentation/useOrgMembers';
 import { avatarStyle, tag } from '../ui';
 
 export default function ProspectDrawer() {
   const { prospects, stages, selectedId, note, activity } = useAppState();
   const { closeDrawer, move, setStageOf, setNote, addNote } = useAppActions();
+  const { session } = useAuth();
+  const { emailOf } = useOrgMembers(session?.memberships[0]?.organizationId ?? null);
   const sel = prospects.find((p) => p.id === selectedId);
   if (!sel) return null;
 
@@ -61,6 +65,7 @@ export default function ProspectDrawer() {
 
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
           {stage && <span style={tag(stageColor(stage.key))}>{stage.label}</span>}
+          {sel.lifecycleStatus === 'client' && <span style={tag('#1F7A5C')}>Client</span>}
           <span style={{ fontSize: 19, fontWeight: 800 }}>{money(sel.valueCents)}</span>
         </div>
 
@@ -69,6 +74,8 @@ export default function ProspectDrawer() {
           <InfoBox label="PROCHAIN SUIVI" value={formatNextFollowUp(sel.nextFollowUpAt)} />
           <InfoBox label="COURRIEL" value={sel.email || '—'} wrap />
           <InfoBox label="TÉLÉPHONE" value={sel.phone || '—'} />
+          <InfoBox label="RESPONSABLE" value={emailOf(sel.ownerUserId) ?? 'Non assigné'} wrap />
+          {sel.utmSource && <InfoBox label="SOURCE UTM" value={[sel.utmSource, sel.utmCampaign].filter(Boolean).join(' · ')} wrap />}
         </div>
 
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>

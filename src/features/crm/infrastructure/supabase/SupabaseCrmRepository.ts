@@ -1,6 +1,21 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { CrmRepository } from '../../application/CrmRepository';
-import type { ActivityItem, Contact, ContactDetail, CrmBundle, NewContactInput, NewProspectInput, NewTaskInput, Prospect, Stage, Task } from '../../domain/crm';
+import type {
+  ActivityItem,
+  Contact,
+  ContactDetail,
+  ContactFile,
+  CrmBundle,
+  DuplicateContactMatch,
+  LifecycleStatus,
+  NewContactInput,
+  NewProspectInput,
+  NewTaskInput,
+  OrgMember,
+  Prospect,
+  Stage,
+  Task,
+} from '../../domain/crm';
 
 function mapStage(row: Record<string, unknown>): Stage {
   return {
@@ -27,6 +42,13 @@ function mapProspect(row: Record<string, unknown>): Prospect {
     email: (contact?.email as string) ?? '',
     phone: (contact?.phone as string) ?? '',
     nextFollowUpAt: (row.next_follow_up_at as string | null) ?? null,
+    ownerUserId: (row.owner_user_id as string | null) ?? null,
+    lifecycleStatus: ((contact?.lifecycle_status as LifecycleStatus | undefined) ?? 'prospect'),
+    utmSource: (row.utm_source as string | null) ?? null,
+    utmMedium: (row.utm_medium as string | null) ?? null,
+    utmCampaign: (row.utm_campaign as string | null) ?? null,
+    wonAt: (row.won_at as string | null) ?? null,
+    lostAt: (row.lost_at as string | null) ?? null,
   };
 }
 
@@ -50,6 +72,19 @@ function mapContact(row: Record<string, unknown>): Contact {
     email: (row.email as string) ?? '',
     phone: (row.phone as string) ?? '',
     source: (row.source as string) ?? '',
+    createdAt: row.created_at as string,
+    ownerUserId: (row.owner_user_id as string | null) ?? null,
+    lifecycleStatus: (row.lifecycle_status as LifecycleStatus | undefined) ?? 'prospect',
+  };
+}
+
+function mapContactFile(row: Record<string, unknown>): ContactFile {
+  return {
+    id: row.id as string,
+    fileName: row.file_name as string,
+    storagePath: row.storage_path as string,
+    mimeType: (row.mime_type as string | null) ?? null,
+    sizeBytes: (row.size_bytes as number | null) ?? null,
     createdAt: row.created_at as string,
   };
 }
@@ -82,7 +117,7 @@ export function createSupabaseCrmRepository(client: SupabaseClient): CrmReposito
           : Promise.resolve({ data: [], error: null }),
         client
           .from('opportunities')
-          .select('*, contacts(name, company_name, email, phone, source)')
+          .select('*, contacts(name, company_name, email, phone, source, lifecycle_status)')
           .eq('organization_id', organizationId)
           .is('deleted_at', null)
           .order('created_at', { ascending: false }),
@@ -126,7 +161,15 @@ export function createSupabaseCrmRepository(client: SupabaseClient): CrmReposito
 
       const { data: contact, error: contactErr } = await client
         .from('contacts')
-        .insert({ organization_id: organizationId, name: input.name, company_name: input.name, source: 'Création manuelle' })
+        .insert({
+          organization_id: organizationId,
+          name: input.name,
+          company_name: input.name,
+          email: input.email || null,
+          phone: input.phone || null,
+          owner_user_id: input.ownerUserId || null,
+          source: 'Création manuelle',
+        })
         .select('id')
         .single();
       if (contactErr || !contact) throw new Error('Le contact n’a pas pu être créé.');
@@ -138,6 +181,7 @@ export function createSupabaseCrmRepository(client: SupabaseClient): CrmReposito
         contact_id: contact.id,
         need: input.need || 'Nouvelle demande',
         value_cents: input.valueCents,
+        owner_user_id: input.ownerUserId || null,
         source: 'Création manuelle',
       });
       if (oppErr) throw new Error('Le prospect n’a pas pu être ajouté.');
@@ -197,6 +241,7 @@ export function createSupabaseCrmRepository(client: SupabaseClient): CrmReposito
         company_name: input.companyName || null,
         email: input.email || null,
         phone: input.phone || null,
+        owner_user_id: input.ownerUserId || null,
         source: 'Création manuelle',
       });
       if (error) throw new Error('Le contact n’a pas pu être créé.');
@@ -207,7 +252,7 @@ export function createSupabaseCrmRepository(client: SupabaseClient): CrmReposito
         client.from('contacts').select('*').eq('id', contactId).single(),
         client
           .from('opportunities')
-          .select('*, contacts(name, company_name, email, phone, source)')
+          .select('*, contacts(name, company_name, email, phone, source, lifecycle_status)')
           .eq('contact_id', contactId)
           .is('deleted_at', null)
           .order('created_at', { ascending: false }),
@@ -237,6 +282,69 @@ export function createSupabaseCrmRepository(client: SupabaseClient): CrmReposito
         note,
       });
       if (error) throw new Error('L’activité n’a pas pu être enregistrée.');
+    },
+
+    async listOrgMembers(organizationId) {
+      const { data, error } = await client.rpc('org_member_directory', { p_organization_id: organizationId });
+      if (error) throw new Error('Les membres de l’équipe n’ont pas pu être chargés.');
+      return ((data as unknown[]) ?? []).map((row) => {
+        const r = row as Record<string, unknown>;
+        return { userId: r.user_id as string, email: r.email as string } satisfies OrgMember;
+      });
+    },
+
+    async findDuplicateContact(organizationId, email, phone) {
+      if (!email && !phone) return null;
+      const { data, error } = await client
+        .rpc('find_duplicate_contact', { p_organization_id: organizationId, p_email: email ?? null, p_phone: phone ?? null })
+        .maybeSingle();
+      if (error) throw new Error('La recherche de doublon a échoué.');
+      if (!data) return null;
+      const row = data as Record<string, unknown>;
+      return {
+        id: row.id as string,
+        name: row.name as string,
+        companyName: (row.company_name as string) ?? '',
+        email: (row.email as string) ?? '',
+        phone: (row.phone as string) ?? '',
+      } satisfies DuplicateContactMatch;
+    },
+
+    async listContactFiles(contactId) {
+      const { data, error } = await client
+        .from('contact_files')
+        .select('*')
+        .eq('contact_id', contactId)
+        .is('deleted_at', null)
+        .order('created_at', { ascending: false });
+      if (error) throw new Error('Les fichiers n’ont pas pu être chargés.');
+      return (data ?? []).map(mapContactFile);
+    },
+
+    async uploadContactFile(organizationId, contactId, file) {
+      const path = `${organizationId}/${contactId}/${Date.now()}-${file.name}`;
+      const { error: uploadError } = await client.storage.from('crm-files').upload(path, file, {
+        contentType: file.type || undefined,
+      });
+      if (uploadError) throw new Error('Le téléversement a échoué.');
+
+      const { data: userData } = await client.auth.getUser();
+      const { error: rowError } = await client.from('contact_files').insert({
+        organization_id: organizationId,
+        contact_id: contactId,
+        uploaded_by: userData.user?.id,
+        storage_path: path,
+        file_name: file.name,
+        mime_type: file.type || null,
+        size_bytes: file.size,
+      });
+      if (rowError) throw new Error('Le fichier a été téléversé, mais son enregistrement a échoué.');
+    },
+
+    async getContactFileUrl(storagePath) {
+      const { data, error } = await client.storage.from('crm-files').createSignedUrl(storagePath, 60);
+      if (error || !data) throw new Error('Le lien de téléchargement n’a pas pu être créé.');
+      return data.signedUrl;
     },
   };
 }

@@ -39,10 +39,6 @@ interface AppState {
   selectedId: string | null;
   note: string;
   newOpen: boolean;
-  fName: string;
-  fSub: string;
-  fValue: string;
-  formError: boolean;
   toast: string | null;
 }
 
@@ -61,10 +57,6 @@ interface AppActions {
   addNote: () => void;
   openNew: () => void;
   closeNew: () => void;
-  setFName: (v: string) => void;
-  setFSub: (v: string) => void;
-  setFValue: (v: string) => void;
-  submitNew: () => void;
   approve: () => void;
   askRevision: () => void;
   showToast: (msg: string) => void;
@@ -88,10 +80,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [note, setNote] = useState('');
   const [newOpen, setNewOpen] = useState(false);
-  const [fName, setFName] = useState('');
-  const [fSub, setFSub] = useState('');
-  const [fValue, setFValue] = useState('');
-  const [formError, setFormError] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout>>();
 
@@ -176,42 +164,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       .catch((err) => showToast(err instanceof Error ? err.message : 'Action impossible.'));
   };
 
-  const openNew = () => {
-    setNewOpen(true);
-    setFormError(false);
-  };
-  const closeNew = () => {
-    setNewOpen(false);
-    setFName('');
-    setFSub('');
-    setFValue('');
-    setFormError(false);
-  };
-
-  const submitNew = () => {
-    if (!fName.trim() || !organizationId) {
-      setFormError(true);
-      return;
-    }
-    void repository
-      .createProspect(organizationId, {
-        name: fName.trim(),
-        need: fSub.trim(),
-        valueCents: (parseInt(fValue.replace(/\D/g, ''), 10) || 0) * 100,
-      })
-      .then(() => {
-        closeNew();
-        showToast('Prospect ajouté à « Nouveau »');
-        void reload();
-      })
-      .catch((err) => showToast(err instanceof Error ? err.message : 'Action impossible.'));
-  };
+  const openNew = () => setNewOpen(true);
+  const closeNew = () => setNewOpen(false);
 
   const state: AppState = {
     screen, variant, loading, loadError,
     stages: bundle.stages, prospects: bundle.prospects, activity: bundle.activities, tasks: bundle.tasks,
-    query, filter, selectedId, note, newOpen, fName, fSub, fValue,
-    formError, toast,
+    query, filter, selectedId, note, newOpen,
+    toast,
   };
 
   const actions: AppActions = useMemo(
@@ -236,17 +196,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       addNote,
       openNew,
       closeNew,
-      setFName,
-      setFSub,
-      setFValue,
-      submitNew,
       approve: () => setScreen('projet'),
       askRevision: () => setScreen('projet'),
       showToast,
       reload,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [fName, fSub, fValue, note, selectedId, bundle, organizationId, reload],
+    [note, selectedId, bundle, organizationId, reload],
   );
 
   return (
