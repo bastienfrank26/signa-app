@@ -1,5 +1,12 @@
 # Tâches atomiques
 
+## Terminées (navigation mobile de l'admin) — 2026-09-13
+
+- [x] Admin (`AdminLayout.tsx`) était 100 % bureau depuis sa construction (Phase 2), jugé acceptable jusqu'ici — Francis l'a demandé quand même. Réutilise le patron exact du shell client (`MobileNav.tsx`/`MobileMoreSheet.tsx`) : `AdminMobileNav.tsx` (barre d'onglets fixe : Organisations/Audit/Indicateurs/Plus) + `AdminMoreSheet.tsx` (courriel, rôle, lien Espace client, Déconnexion)
+- [x] Nav bureau (liens texte + rôle/déconnexion) cachée sous 768px via les classes génériques `.sg-desktop-only` déjà en place (pas de nouvelle classe CSS nécessaire) ; titre « Administration Signa » reste visible en tout temps (contrairement au header CRM, entièrement caché sur mobile faute de contenu restant)
+- [x] Vérifié avec le compte staff, en vrai (390px) : navigation entre les 3 sections + feuille Plus, zéro erreur console
+- [ ] Tableaux admin (liste d'organisations) toujours en grille bureau compressée sur mobile, pas de vraies cartes — même limitation qu'on a acceptée pour Prospects/Contacts côté CRM, pas corrigée ici non plus
+
 ## Terminées (déduplication de contacts) — 2026-09-13
 
 - [x] `email_normalized`/`phone_normalized` ajoutés à `contacts` (déclencheur `contacts_set_normalized`, backfill fait) — migration `20260913010000_contact_deduplication.sql`

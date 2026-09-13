@@ -62,7 +62,7 @@
 - `infrastructure/supabase/SupabaseAdminRepository.ts` — liste/détail organisations, RPC admin (statuts, étapes, memberships), audit
 - `presentation/useStaffRole.ts` — hook + instance partagée du repository (`adminRepository`)
 - `presentation/RequireStaff.tsx` — garde de route (affiche "Accès refusé" si non-personnel)
-- `presentation/AdminLayout.tsx`, `OrganizationsListPage.tsx`, `OrganizationDetailPage.tsx`, `AuditLogPage.tsx`, `ReasonDialog.tsx` (motif obligatoire réutilisable), `SitesSection.tsx` (Phase 4 : création/rotation/statut de site, secret affiché une fois), `BillingSection.tsx` (Phase 5 : statut d'abonnement, lien de paiement), `PilotMetricsPage.tsx` (Phase 6 : indicateurs du pilote), `CreateClientModal.tsx` (2026-09-12 : crée organisation + invitation, affiche le lien à envoyer manuellement)
+- `presentation/AdminLayout.tsx`, `OrganizationsListPage.tsx`, `OrganizationDetailPage.tsx`, `AuditLogPage.tsx`, `ReasonDialog.tsx` (motif obligatoire réutilisable), `SitesSection.tsx` (Phase 4 : création/rotation/statut de site, secret affiché une fois), `BillingSection.tsx` (Phase 5 : statut d'abonnement, lien de paiement), `PilotMetricsPage.tsx` (Phase 6 : indicateurs du pilote), `CreateClientModal.tsx` (2026-09-12 : crée organisation + invitation, affiche le lien à envoyer manuellement), `AdminMobileNav.tsx`/`AdminMoreSheet.tsx` (2026-09-13 : navigation mobile, patron du shell client)
 
 ## `src/features/crm/` (Phase 3)
 

@@ -35,6 +35,8 @@ Non construit. Aucune fonction d'usurpation, silencieuse ou non.
 
 Suspension, révocation de clé, changement de statut de projet et changement d'accès demandent confirmation et motif obligatoire (`ReasonDialog`), et sont auditées (`audit_events`). La suspension conserve les données.
 
+> Note (2026-09-13) : navigation mobile réelle ajoutée à l'admin — même patron que le shell client (barre d'onglets fixe + feuille « Plus », seuil CSS 768px). Les tableaux (liste d'organisations) restent en grille bureau, compressée sur petit écran (même limitation acceptée que Prospects/Contacts côté CRM), pas de vraies cartes mobiles dédiées.
+
 ## Exploitabilité
 
 - Recherche par nom construite ; filtres/pagination avancés non construits.

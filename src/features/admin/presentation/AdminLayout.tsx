@@ -2,6 +2,7 @@ import type { PropsWithChildren } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../auth/presentation/useAuth';
 import { useStaffRole } from './useStaffRole';
+import AdminMobileNav from './AdminMobileNav';
 
 const navItemStyle = (active: boolean) =>
   ({
@@ -48,7 +49,7 @@ export default function AdminLayout({ children }: PropsWithChildren) {
           </span>
           Administration Signa
         </div>
-        <nav style={{ display: 'flex', gap: 6 }}>
+        <nav className="sg-desktop-only" style={{ gap: 6 }}>
           <Link to="/admin/organisations" style={navItemStyle(location.pathname.startsWith('/admin/organisations'))}>
             Organisations
           </Link>
@@ -59,7 +60,7 @@ export default function AdminLayout({ children }: PropsWithChildren) {
             Indicateurs
           </Link>
         </nav>
-        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 14, fontSize: 12.5, color: 'var(--sg-side-muted)' }}>
+        <div className="sg-desktop-only" style={{ marginLeft: 'auto', alignItems: 'center', gap: 14, fontSize: 12.5, color: 'var(--sg-side-muted)' }}>
           <span>Rôle : {role}</span>
           <Link to="/" style={{ color: 'var(--sg-side-muted)' }}>
             Espace client
@@ -72,7 +73,8 @@ export default function AdminLayout({ children }: PropsWithChildren) {
           </button>
         </div>
       </header>
-      <main style={{ padding: '28px 24px', maxWidth: 1100, margin: '0 auto' }}>{children}</main>
+      <main className="sg-main-content" style={{ maxWidth: 1100, margin: '0 auto' }}>{children}</main>
+      <AdminMobileNav />
     </div>
   );
 }
